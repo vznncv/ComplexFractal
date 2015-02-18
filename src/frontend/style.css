@@ -1,0 +1,31 @@
+/* style of the root element GridPane*/
+#root {
+    -fx-alignment: center;
+    -fx-background-image: url("background.png");
+/*    -fx-grid-lines-visible: true;*/
+    -fx-hgap: 10px;
+    -fx-vgap: 10px;
+}
+
+/* font style of the root element */
+#root {
+    -fx-font-size: 12pt;
+    -fx-font-family: "Arial Narrow";
+    -fx-font-weight: bold;
+}
+
+/* style of the labels */
+Label {
+    -fx-text-fill: white;
+}
+
+/* style of the buttons */
+Button {
+    -fx-text-fill: white;
+    -fx-background-color: linear-gradient(#61A2B1, #2A5058);
+    -fx-effect: innershadow(three-pass-box, rgba(0, 0, 0, 1), 6, 0, 0, 2);
+    -fx-background-radius: 10px;
+}
+Button:pressed {
+    -fx-background-color: linear-gradient(#2A5058, #61A2B1);
+}
