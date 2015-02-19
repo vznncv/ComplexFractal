@@ -40,13 +40,6 @@ public class Controller {
      */
     public void repaintCanvas() {
         /*
-        GraphicsContext gc = mainCanvas.getGraphicsContext2D();
-        double width = mainCanvas.getWidth();
-        double height = mainCanvas.getHeight();
-        gc.clearRect(0, 0, width, height);
-        gc.setFill(Color.GREEN);
-        gc.setLineWidth(5);
-        gc.fillOval(10, 10, width - 20, height - 20);
 
         Point2D a = new Point2D(1, 1);
         Point2DTransformer  tr = new Point2DTransformer();
