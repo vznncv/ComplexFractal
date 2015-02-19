@@ -1,22 +1,19 @@
 package local.fractal;
 
-import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 import local.fractal.model.ComplexFractal;
 import local.fractal.model.ComplexFractalChecker;
-import local.fractal.util.IterativePalette;
-import local.fractal.util.IterativePaletteV1;
-import local.fractal.util.Point2D;
-import local.fractal.util.Point2DTransformer;
+import local.fractal.util.*;
 
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -54,7 +51,6 @@ public class ComplexFractalDrawer {
      * it indicates that the thread for drawing is working.
      */
     private volatile boolean work;
-    private LinkedList<Runnable> taskToDraw;
 
     /**
      * {@code ComplexFractalDrawer} is helper class for drawing fractal.
@@ -156,30 +152,8 @@ public class ComplexFractalDrawer {
      * It's non blocking method starts drawing of the fractal in canvas.
      */
     public synchronized void draw() {
-        new Thread(() -> {
-            synchronized (this) {
-                // stop previous drawing
-                if (isWork()) {
-                    stopDrawing();
-                    try {
-                        drawingThread.join();
-                    } catch (InterruptedException e) {
-                        System.err.println("Error waiting the end of the thread: " + e);
-                    }
-                }
-                // get current transformation
-                final Point2DTransformer tr = new Point2DTransformer(getTransform());
-                // get current fractal
-                final ComplexFractalChecker fc = getFractal();
-                // get current palette
-                final IterativePalette pl = getPalette();
-                // create and start thread for drawing
-                drawingThread = new Thread(() -> drawFractal(tr, fc, pl));
-                // start drawing
-                work = true;
-                drawingThread.start();
-            }
-        }).start();
+        // prepare and start drawing fractal
+        (new Thread(this::prepareDrawingFractal)).start();
     }
 
     /**
@@ -187,23 +161,76 @@ public class ComplexFractalDrawer {
      *
      * @return thread is working or not
      */
-    public synchronized boolean isWork() {
+    public boolean isWork() {
         return work;
+    }
+
+    /**
+     * Set state of the drawing.
+     *
+     * @param work thread works or not
+     */
+    private void setWork(boolean work) {
+        this.work = work;
+    }
+
+    /**
+     * Need drawing stop?
+     *
+     * @return true if drawing need stop else false
+     */
+    private boolean isStopWork() {
+        return stopWork;
+    }
+
+    /**
+     * Set state of the stop work.
+     *
+     * @param stopWork state
+     */
+    private void setStopWork(boolean stopWork) {
+        this.stopWork = stopWork;
     }
 
     /**
      * It's non blocking method stopping current drawing of the fractal in canvas.
      */
-    public synchronized void stopDrawing() {
+    public void stopDrawing() {
+        setStopWork(true);
+    }
+
+    /**
+     * This method prepared drawing fractal and start drawing.
+     */
+    private synchronized void prepareDrawingFractal() {
+        // stop previous drawing
         if (isWork()) {
-            stopWork = true;
+            stopDrawing();
+            try {
+                drawingThread.join();
+            } catch (InterruptedException e) {
+                System.err.println("Error waiting the end of the thread: " + e);
+            }
         }
+        // prepare and start new drawing
+        // get current transformation
+        final Point2DTransformer tr = new Point2DTransformer(getTransform());
+        // get current fractal
+        final ComplexFractalChecker fc = getFractal();
+        // get current palette
+        final IterativePalette pl = getPalette();
+        // create and start thread for drawing
+        drawingThread = new Thread(() -> drawFractal(tr, fc, pl));
+        // start drawing
+        setStopWork(false);
+        setWork(true);
+        drawingThread.start();
     }
 
     /**
      * Method for thread drawing fractal.
      */
-    private void drawFractal(Point2DTransformer currentTransform, ComplexFractalChecker currentFractal, IterativePalette currentPalette) {
+    private void drawFractal(Point2DTransformer cTr, ComplexFractalChecker cFc, IterativePalette cPl) {
         // size of the canvas
         int w = canvas.widthProperty().intValue();
         int h = canvas.heightProperty().intValue();
@@ -211,160 +238,48 @@ public class ComplexFractalDrawer {
         // graphic context for drawing points
         PixelWriter pw = canvas.getGraphicsContext2D().getPixelWriter();
 
+
         // function for generate line of the points
-        UnaryOperator<Point2D> genLine = (p) -> {
-            return new Point2D(p.getX() + 1, p.getY());
-        };
+        UnaryOperator<Point2D> genLine = (p) -> new Point2D(p.getX() + 1, p.getY());
         // function for transformation points
-        Function<Point2D, PointAndPoint> toTransform = (p) -> {
-            return new PointAndPoint(p, currentTransform.apply(p));
-        };
+        Function<Point2D, Pair<Point2D, Point2D>> toTransform = (p) -> new Pair<>(p, cTr.apply(p));
+
         // function for calculating number of iterations
-        Function<PointAndPoint, PointAndInt> toCalc = (elem) -> {
-            int i = currentFractal.numberIter(elem.p2.toComplex());
-            return new PointAndInt(elem.p1, i);
-        };
+        Function<Pair<Point2D, Point2D>, Pair<Point2D, Integer>> toCalc = (elem) ->
+                new Pair<>(elem.getFirst(), cFc.numberIter(elem.getSecond().toComplex()));
         // function for to color point
-        Function<PointAndInt, PointAndColor> toColor = (elem) -> {
-            return new PointAndColor(elem.p, currentPalette.numIterToColor(elem.i));
-        };
+        Function<Pair<Point2D, Integer>, Pair<Point2D, Color>> toColor = (elem) ->
+                new Pair<>(elem.getFirst(), cPl.numIterToColor(elem.getSecond()));
+
+
         // function for draw point in the canvas
-        Consumer<PointAndColor> drawPoint = (elem) -> {
-            Point2D point = elem.p;
+        Consumer<Pair<Point2D, Color>> drawPoint = (elem) -> {
+            Point2D point = elem.getFirst();
             int xP = (int) point.getX();
             int yP = (int) point.getY();
-            pw.setColor(xP, yP, elem.c);
+            pw.setColor(xP, yP, elem.getSecond());
         };
 
-        /*
-        Stream<Point2D> points = Stream.empty();
-        for (int y = 0; y < h; y++) {
-            points = Stream.concat(points, Stream.iterate(new Point2D(0, y), genLine).limit(w));
-        }
-        Stream<PointAndColor> lineForDrawing = points.parallel() // create line with points
-                .map(toTransform) // transform points
-                .map(toCalc) // calculate number of iterations;
-                .map(toColor) // change color
-                .sequential();
-
-        Platform.runLater(()->lineForDrawing.forEach(drawPoint));
-*/
-
-
-        // for grouping line do draw
-        taskToDraw = new LinkedList<>();
-        AnimationTimer tm = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-//                System.out.println("Task Start: " + System.currentTimeMillis());
-                synchronized (taskToDraw) {
-                    int maxLine = 5;
-                    int i = 0;
-                    while (!taskToDraw.isEmpty() && i < maxLine) {
-                        taskToDraw.remove().run();
-                        i++;
-                    }
-
-//                    taskToDraw.forEach((elem)->elem.run());
-//                    taskToDraw.clear();
-                    System.out.println("Lines were: " + taskToDraw.size() + " (max: " + h + ")");
-                }
-//                System.out.println("Task Start: " + System.currentTimeMillis());
-//                System.out.println("Time: " + now);
-            }
-        };
-        Platform.runLater(() -> {
-            tm.start();
-        });
-
-
-        int j = 0;
-
-        // draw fractal
         int y = 0;
-        while (!stopWork && y < h) {
-            Stream<PointAndColor> lineForDrawing = Stream
-                    .iterate(new Point2D(0, y), genLine).limit(w).parallel() // create line with points
-                    .map(toTransform) // transform points
-                    .map(toCalc) // calculate number of iterations;
-                    .map(toColor) // change color
-                    .sequential();
-
-            synchronized (taskToDraw) {
-                taskToDraw.add(() -> lineForDrawing.forEach(drawPoint));
-            }
-            /*
-            taskToDraw.add(() -> lineForDrawing.forEach(drawPoint));
-            j++;
-
-            if (j > 100) {
-                final LinkedList<Runnable> task = taskToDraw;
-                // show line
-                Platform.runLater(() -> {
-
-                    task.forEach((elem)->elem.run());
-                });
-                taskToDraw = new LinkedList<>();
-                j = 0;
-            }*/
-
-            // go to next line
+        while (!isStopWork() && y < h) {
+            // create list of points to draw
+            List<Pair<Point2D, Color>> line = Stream
+                    .iterate(new Point2D(0, y), genLine)
+                    .limit(w)
+                    .parallel()
+                    .map(toTransform)
+                    .map(toCalc)
+                    .map(toColor)
+                    .collect(Collectors.toList());
+            // draw line
+            Platform.runLater(() -> line.forEach(drawPoint));
+            // go to the next line
             y++;
         }
 
-        //tm.stop();*/
-        boolean b = true;
-        while (b) {
-            synchronized (taskToDraw) {
-                b = !taskToDraw.isEmpty();
-            }
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        tm.stop();
-
-
         // thread stop working
-        work = false;
-        stopWork = false;
+        setWork(false);
+        setStopWork(false);
     }
-
-    /**
-     * There are helpers classes for drawing fractals, using streams.
-     */
-    private static class PointAndPoint {
-        public Point2D p1;
-        public Point2D p2;
-
-        public PointAndPoint(Point2D p1, Point2D p2) {
-            this.p1 = p1;
-            this.p2 = p2;
-        }
-    }
-
-    private static class PointAndInt {
-        public Point2D p;
-        public int i;
-
-        public PointAndInt(Point2D p, int i) {
-            this.p = p;
-            this.i = i;
-        }
-    }
-
-    private static class PointAndColor {
-        public Point2D p;
-        public Color c;
-
-        public PointAndColor(Point2D p, Color c) {
-            this.p = p;
-            this.c = c;
-        }
-    }
-
 
 }

@@ -12,6 +12,7 @@ import local.fractal.model.MandelbrotSet;
  * @author Kochin Konstantin Alexandrovich
  */
 public class Controller {
+    ComplexFractalDrawer fd;
     // the root node
     @FXML
     private GridPane root;
@@ -30,6 +31,8 @@ public class Controller {
         double HBorder = 100;
         mainCanvas.widthProperty().bind(Bindings.subtract(root.widthProperty(), wBorder));
         mainCanvas.heightProperty().bind(Bindings.subtract(root.heightProperty(), HBorder));
+
+        fd = new ComplexFractalDrawer(mainCanvas, new MandelbrotSet());
     }
 
     /**
@@ -115,7 +118,8 @@ public class Controller {
         colors.forEach((color) -> System.out.print(color + "; "));
         System.out.println();*/
 
-        ComplexFractalDrawer fd = new ComplexFractalDrawer(mainCanvas, new MandelbrotSet());
+        //fd = new ComplexFractalDrawer(mainCanvas, new MandelbrotSet());
+        fd.getTransform().clear();
         fd.getTransform().scale(1, 1);
         fd.draw();
 

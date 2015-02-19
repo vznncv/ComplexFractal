@@ -1,4 +1,4 @@
-package local.fractal.util.Pair;
+package local.fractal.util;
 
 /**
  * It's helper class contains pair of the elements
