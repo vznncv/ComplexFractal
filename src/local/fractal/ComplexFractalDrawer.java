@@ -25,7 +25,13 @@ public class ComplexFractalDrawer {
     /**
      * Object for scaling, rotating, translating the plane of the fractal.
      */
-    private Point2DTransformer transform;
+    private Point2DTransformer transform = new Point2DTransformer();
+    /**
+     * This transform move initial origin of the coordinate to the center of the canvas
+     * which that points (1,0) and (0,1) is in canvas. (need when window resizes).
+     */
+    private Point2DTransformer initAxisTransform = new Point2DTransformer();
+
     /**
      * Canvas for drawing.
      */
@@ -86,21 +92,28 @@ public class ComplexFractalDrawer {
     private synchronized void setCanvas(Canvas canvas) {
         this.canvas = Objects.requireNonNull(canvas, "canvas is null");
         // correct initializing transform
-        transform = new Point2DTransformer() {
-            @Override
-            public void clear() {
-                super.clear();
-                double w = canvas.getWidth();
-                double h = canvas.getHeight();
-                // translation the origin of coordinates to center of the canvas
-                translation(-w / 2.0, -h / 2.0);
-                // scaling that point (1, 0) or (0,1) will be at bound of the canvas
-                double scaleXY = 2.0 / Math.min(w, h);
-                scale(scaleXY, scaleXY);
-            }
-        };
-        // initialize transform
         transform.clear();
+        updateCanvasTransformation();
+        // update initAxisTransform and redraw fractal when canvas is resized
+        canvas.heightProperty().addListener(val -> updateCanvasTransformation());
+        canvas.widthProperty().addListener(val -> updateCanvasTransformation());
+        // redraw canvas when it resized
+        canvas.heightProperty().addListener(val -> draw());
+        canvas.widthProperty().addListener(val -> draw());
+    }
+
+    /**
+     * Update initAxisTransform when canvas is resized.
+     */
+    private synchronized void updateCanvasTransformation() {
+        initAxisTransform.clear();
+        double w = canvas.getWidth();
+        double h = canvas.getHeight();
+        // translation the origin of coordinates to center of the canvas
+        initAxisTransform.translation(-w / 2.0, -h / 2.0);
+        // scaling that point (1, 0) or (0,1) will be at bound of the canvas
+        double scaleXY = 2.0 / Math.min(w, h);
+        initAxisTransform.scale(scaleXY, scaleXY);
     }
 
     /**
@@ -214,13 +227,20 @@ public class ComplexFractalDrawer {
         }
         // prepare and start new drawing
         // get current transformation
-        final Point2DTransformer tr = new Point2DTransformer(getTransform());
+        final Point2DTransformer tr = Point2DTransformer.mul(initAxisTransform, getTransform());
         // get current fractal
         final ComplexFractalChecker fc = getFractal();
         // get current palette
         final IterativePalette pl = getPalette();
-        // create and start thread for drawing
-        drawingThread = new Thread(() -> drawFractal(tr, fc, pl));
+        // current size of the canvas
+        int w = canvas.widthProperty().intValue();
+        int h = canvas.heightProperty().intValue();
+        // pixel writer for canvas
+        PixelWriter pw = canvas.getGraphicsContext2D().getPixelWriter();
+        // create and start thread for drawing if size of the canvas isn't negative
+        if (w >= 0 && h >= 0) {
+            drawingThread = new Thread(() -> drawFractal(w, h, pw, tr, fc, pl));
+        }
         // start drawing
         setStopWork(false);
         setWork(true);
@@ -230,15 +250,7 @@ public class ComplexFractalDrawer {
     /**
      * Method for thread drawing fractal.
      */
-    private void drawFractal(Point2DTransformer cTr, ComplexFractalChecker cFc, IterativePalette cPl) {
-        // size of the canvas
-        int w = canvas.widthProperty().intValue();
-        int h = canvas.heightProperty().intValue();
-
-        // graphic context for drawing points
-        PixelWriter pw = canvas.getGraphicsContext2D().getPixelWriter();
-
-
+    private void drawFractal(int w, int h, PixelWriter pw, Point2DTransformer cTr, ComplexFractalChecker cFc, IterativePalette cPl) {
         // function for generate line of the points
         UnaryOperator<Point2D> genLine = (p) -> new Point2D(p.getX() + 1, p.getY());
         // function for transformation points

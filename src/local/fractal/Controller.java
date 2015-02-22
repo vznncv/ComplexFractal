@@ -40,7 +40,7 @@ public class Controller {
      */
     public void repaintCanvas() {
 
-        fd.getTransform().clear();
-        fd.draw();
+        //fd.getTransform().clear();
+        //fd.draw();
     }
 }

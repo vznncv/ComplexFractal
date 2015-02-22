@@ -26,11 +26,26 @@ public class Point2DTransformer {
     }
 
     /**
-     * Copy constructor.
+     * Create from matrix of the transformation.
+     * @param transMat matrix of the transformation
      */
-    public Point2DTransformer(Point2DTransformer obj) {
-        Objects.requireNonNull(obj, "obj is null");
-        transMat = obj.transMat.copy();
+    private Point2DTransformer(RealMatrix transMat) {
+        Objects.requireNonNull(transMat);
+        if (transMat.getColumnDimension() != 3 && transMat.getRowDimension() != 3) {
+            throw new IllegalArgumentException("transMat doesn't have size 3 by 3");
+        }
+        this.transMat = transMat;
+    }
+
+    /**
+     * Return new matrix as result multiplication l and r transformation.
+     *
+     * @param l transformation
+     * @param r transformation
+     * @return transformation
+     */
+    public static Point2DTransformer mul(Point2DTransformer l, Point2DTransformer r) {
+        return new Point2DTransformer(l.transMat.multiply(r.transMat));
     }
 
     /**
@@ -97,6 +112,8 @@ public class Point2DTransformer {
         transMat = MatrixUtils.createRealMatrix(mat).multiply(transMat);
         return this;
     }
+
+
 
 
     /**
