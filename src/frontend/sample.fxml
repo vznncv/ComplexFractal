@@ -2,19 +2,27 @@
 
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
 <?import java.net.URL?>
-<GridPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" xmlns="http://javafx.com/javafx/8"
-          fx:controller="local.fractal.Controller">
+<GridPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefHeight="400" prefWidth="600"
+          xmlns="http://javafx.com/javafx/8" fx:controller="local.fractal.Controller">
     <stylesheets>
         <URL value="@style.css"/>
     </stylesheets>
 
     <children>
-        <Canvas fx:id="mainCanvas" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-        <Label fx:id="labelInfo" GridPane.halignment="CENTER" text="Information label" GridPane.columnIndex="0"
-               GridPane.rowIndex="1"/>
-        <Button text="Button" GridPane.halignment="CENTER" GridPane.rowIndex="2" onAction="#repaintCanvas"/>
+        <Canvas fx:id="mainCanvas" height="${root.height-100}" width="${root.width-40}" GridPane.columnIndex="0"
+                GridPane.rowIndex="0"/>
+        <HBox fx:id="controlPanel" GridPane.columnIndex="0" GridPane.rowIndex="1">
+
+            <children>
+                <Circle fx:id="workIndicator" radius="10" styleClass="waiting"/>
+                <Button onAction="#repaintCanvas" text="Button" GridPane.halignment="CENTER"/>
+            </children>
+
+        </HBox>
+
     </children>
+
 </GridPane>

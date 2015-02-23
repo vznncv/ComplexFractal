@@ -1,9 +1,11 @@
 package local.fractal;
 
-import javafx.beans.binding.Bindings;
+import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.layout.GridPane;
+import javafx.scene.shape.Circle;
 import local.fractal.model.MandelbrotSet;
 
 /**
@@ -19,20 +21,29 @@ public class Controller {
     // canvas for painting
     @FXML
     private Canvas mainCanvas;
+    // indicator of the work
+    @FXML
+    private Circle workIndicator;
 
     /**
      * Initialize function, it will be invoked after the scene graph is loaded.
      */
     public void initialize() {
-        // set canvas size as:
-        // mainCanvas.width = root.width - wBorder
-        // mainCanvas.height = root.height - hBorder;
-        double wBorder = 40;
-        double HBorder = 100;
-        mainCanvas.widthProperty().bind(Bindings.subtract(root.widthProperty(), wBorder));
-        mainCanvas.heightProperty().bind(Bindings.subtract(root.heightProperty(), HBorder));
-
         fd = new ComplexFractalDrawer(mainCanvas, new MandelbrotSet());
+        // set indicator of the working
+        fd.workProperty().addListener((obs) -> {
+            Platform.runLater(() -> {
+                boolean status = ((ReadOnlyBooleanProperty) obs).get();
+                workIndicator.getStyleClass().clear();
+                if (status) {
+                    workIndicator.getStyleClass().add("working");
+                } else {
+                    workIndicator.getStyleClass().add("waiting");
+                }
+            });
+
+        });
+
     }
 
     /**
@@ -40,7 +51,5 @@ public class Controller {
      */
     public void repaintCanvas() {
 
-        //fd.getTransform().clear();
-        //fd.draw();
     }
 }

@@ -5,6 +5,8 @@
 /*    -fx-grid-lines-visible: true;*/
     -fx-hgap: 10px;
     -fx-vgap: 10px;
+    -fx-halignment: center;
+    -fx-valignment: center;
 }
 
 /* font style of the root element */
@@ -28,4 +30,21 @@ Button {
 }
 Button:pressed {
     -fx-background-color: linear-gradient(#2A5058, #61A2B1);
+}
+
+/* style of the control panel */
+#controlPanel {
+    -fx-grid-lines-visible: true;
+    -fx-hgap: 10px;
+    -fx-vgap: 10px;
+}
+
+/* style of the indicator of the work */
+#workIndicator.waiting {
+    -fx-fill: blue;
+    -fx-effect: dropshadow(gaussian, blue, 12, 0, 0, 0);
+}
+#workIndicator.working {
+    -fx-fill: red;
+    -fx-effect: dropshadow(gaussian, red, 12, 0, 0, 0);
 }
