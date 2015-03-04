@@ -1,12 +1,14 @@
 package local.fractal;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.layout.GridPane;
 import javafx.scene.shape.Circle;
 import local.fractal.model.MandelbrotSet;
+
+import java.util.List;
 
 /**
  * It's controller of the main window.
@@ -16,8 +18,8 @@ import local.fractal.model.MandelbrotSet;
 public class Controller {
     ComplexFractalDrawer fd;
     // the root node
-    @FXML
-    private GridPane root;
+    //@FXML
+    //private GridPane root;
     // canvas for painting
     @FXML
     private Canvas mainCanvas;
@@ -31,19 +33,16 @@ public class Controller {
     public void initialize() {
         fd = new ComplexFractalDrawer(mainCanvas, new MandelbrotSet());
         // set indicator of the working
-        fd.workProperty().addListener((obs) -> {
-            Platform.runLater(() -> {
-                boolean status = ((ReadOnlyBooleanProperty) obs).get();
-                workIndicator.getStyleClass().clear();
-                if (status) {
-                    workIndicator.getStyleClass().add("working");
-                } else {
-                    workIndicator.getStyleClass().add("waiting");
-                }
-            });
-
+        InvalidationListener updateWorkIndicator = (obs) -> Platform.runLater(() -> {
+            boolean status = ((ReadOnlyBooleanProperty) obs).get();
+            List<String> styleClasses = workIndicator.getStyleClass();
+            styleClasses.clear();
+            styleClasses.add(status ? "working" : "waiting");
         });
-
+        // bind indicator
+        fd.workProperty().addListener(updateWorkIndicator);
+        // set initial value of the indicator
+        updateWorkIndicator.invalidated(fd.workProperty());
     }
 
     /**

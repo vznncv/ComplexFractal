@@ -1,28 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.Circle?>
 <?import java.net.URL?>
-<GridPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefHeight="400" prefWidth="600"
-          xmlns="http://javafx.com/javafx/8" fx:controller="local.fractal.Controller">
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefHeight="600" prefWidth="800"
+            xmlns="http://javafx.com/javafx/8" fx:controller="local.fractal.Controller">
     <stylesheets>
         <URL value="@style.css"/>
     </stylesheets>
 
-    <children>
-        <Canvas fx:id="mainCanvas" height="${root.height-100}" width="${root.width-40}" GridPane.columnIndex="0"
-                GridPane.rowIndex="0"/>
-        <HBox fx:id="controlPanel" GridPane.columnIndex="0" GridPane.rowIndex="1">
+    <!-- canvas for drawing the fractal -->
+    <center>
+        <Canvas fx:id="mainCanvas" height="${root.height-150}" width="${root.width-40}"/>
+    </center>
 
+    <!-- control elements -->
+    <bottom>
+        <HBox fx:id="controlPanel">
             <children>
-                <Circle fx:id="workIndicator" radius="10" styleClass="waiting"/>
-                <Button onAction="#repaintCanvas" text="Button" GridPane.halignment="CENTER"/>
+
+                <!-- working indicator -->
+                <Circle fx:id="workIndicator" radius="10"/>
+
+                <!-- control of the zoom and position panel -->
+                <HBox fx:id="controlPositionPanel">
+                    <children>
+
+                        <!-- restore default setting -->
+                        <Button fx:id="restoreDefaultButton" text="Default"
+                                GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.rowSpan="2">
+                            <tooltip>
+                                <Tooltip text="Restore default zoom and position."/>
+                            </tooltip>
+                        </Button>
+
+                        <!-- control of the zoom -->
+                        <VBox fx:id="controlZoomPane">
+                            <children>
+                                <fx:define>
+                                    <ToggleGroup fx:id="zoomToggleGroup"/>
+                                </fx:define>
+                                <RadioButton text="Zoom in" toggleGroup="$zoomToggleGroup" selected="true">
+                                    <tooltip>
+                                        <Tooltip text="Zoom in into 2 times. Left-click on canvas to zoom in."/>
+                                    </tooltip>
+                                </RadioButton>
+                                <RadioButton text="Zoom out" toggleGroup="$zoomToggleGroup">
+                                    <tooltip>
+                                        <Tooltip text="Zoom out into 2 times. Left-click on canvas to zoom out."/>
+                                    </tooltip>
+                                </RadioButton>
+                            </children>
+                        </VBox>
+
+                        <!-- control of the translation -->
+                        <GridPane fx:id="controlTranslationPane">
+                            <children>
+                                <Button text="↑" GridPane.rowIndex="0" GridPane.columnIndex="1">
+                                    <tooltip>
+                                        <Tooltip text="Move up by half."/>
+                                    </tooltip>
+                                </Button>
+                                <Button text="→" GridPane.rowIndex="1" GridPane.columnIndex="2">
+                                    <tooltip>
+                                        <Tooltip text="Move right by half."/>
+                                    </tooltip>
+                                </Button>
+                                <Button text="↓" GridPane.rowIndex="2" GridPane.columnIndex="1">
+                                    <tooltip>
+                                        <Tooltip text="Move down by half."/>
+                                    </tooltip>
+                                </Button>
+                                <Button text="←" GridPane.rowIndex="1" GridPane.columnIndex="0">
+                                    <tooltip>
+                                        <Tooltip text="Move left by half"/>
+                                    </tooltip>
+                                </Button>
+                            </children>
+                        </GridPane>
+
+                        <!-- control of the rotate -->
+                        <VBox fx:id="controlRotatePane">
+                            <children>
+                                <Label text="rotation"/>
+                                <Slider orientation="HORIZONTAL"/>
+                                <Label text="value"/>
+                            </children>
+                        </VBox>
+
+                    </children>
+                </HBox>
+
+                <!-- fractal and palette settings -->
+                <VBox fx:id="fractalSettingsPanel">
+                    <Button text="Choose fractal">
+                        <tooltip>
+                            <Tooltip text="Chose the type of the fractal"/>
+                        </tooltip>
+                    </Button>
+                    <Button text="Palette settings">
+                        <tooltip>
+                            <Tooltip text="Fractal color setting"/>
+                        </tooltip>
+                    </Button>
+                </VBox>
+
+
+                <!-- save current image to the file -->
+                <Button text="Save">
+                    <tooltip>
+                        <Tooltip text="Save current view"/>
+                    </tooltip>
+                </Button>
+
             </children>
-
         </HBox>
+    </bottom>
 
-    </children>
-
-</GridPane>
+</BorderPane>

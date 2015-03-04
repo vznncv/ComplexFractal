@@ -22,15 +22,15 @@ public class Main extends Application {
         // create the graph scene
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         // create the scene
-        Scene scene = new Scene(root, 600, 400);
+        Scene scene = new Scene(root);
         // add the scene to the stage
         primaryStage.setScene(scene);
 
         // set title of the window
         primaryStage.setTitle("Fractals");
         // set minimal size of window
-        primaryStage.minWidthProperty().set(400);
-        primaryStage.minHeightProperty().set(300);
+        primaryStage.minWidthProperty().set(600);
+        primaryStage.minHeightProperty().set(400);
 
         // show windows
         primaryStage.show();

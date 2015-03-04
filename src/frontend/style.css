@@ -1,50 +1,88 @@
-/* style of the root element GridPane*/
-#root {
-    -fx-alignment: center;
+/* root element (BorderPane)*/
+.root {
     -fx-background-image: url("background.png");
-/*    -fx-grid-lines-visible: true;*/
-    -fx-hgap: 10px;
-    -fx-vgap: 10px;
-    -fx-halignment: center;
-    -fx-valignment: center;
+    -fx-padding: 5px;
 }
 
-/* font style of the root element */
-#root {
-    -fx-font-size: 12pt;
+/* borders and padding of the control panels */
+#controlPanel,
+#controlPositionPanel,
+#fractalSettingsPanel{
+    -fx-border-width: 2px;
+    -fx-border-color: DARKSLATEGREY;
+    -fx-border-radius: 5px;
+    -fx-padding: 5px;
+    -fx-effect: dropshadow(gaussian, DARKSLATEGREY, 4, 0, 0, 0);
+}
+
+/* unlimited size of the all buttons */
+.button {
+    -fx-max-height: 9999;
+    -fx-max-width: 9999;
+}
+
+/* common style for buttons */
+.button {
+    -fx-text-fill: white;
     -fx-font-family: "Arial Narrow";
     -fx-font-weight: bold;
-}
-
-/* style of the labels */
-Label {
-    -fx-text-fill: white;
-}
-
-/* style of the buttons */
-Button {
-    -fx-text-fill: white;
     -fx-background-color: linear-gradient(#61A2B1, #2A5058);
-    -fx-effect: innershadow(three-pass-box, rgba(0, 0, 0, 1), 6, 0, 0, 2);
+    -fx-effect: innershadow(three-pass-box, rgba(0, 0, 0, 1), 4, 0, 0, 2);
     -fx-background-radius: 10px;
 }
-Button:pressed {
-    -fx-background-color: linear-gradient(#2A5058, #61A2B1);
+.button:pressed {
+    -fx-background-color: linear-gradient(#54818C, #172E32);
 }
 
-/* style of the control panel */
-#controlPanel {
-    -fx-grid-lines-visible: true;
-    -fx-hgap: 10px;
-    -fx-vgap: 10px;
+/* common style for labels and radio buttons */
+.label, .radio-button {
+    -fx-text-fill: white;
+    -fx-font-family: "Arial Narrow";
 }
+
+
+/* settings of the main panel */
+#controlPanel {
+    -fx-alignment: center;
+    -fx-spacing: 8px;
+}
+
 
 /* style of the indicator of the work */
 #workIndicator.waiting {
     -fx-fill: blue;
-    -fx-effect: dropshadow(gaussian, blue, 12, 0, 0, 0);
+    -fx-effect: dropshadow(gaussian, blue, 6, 0, 0, 0);
 }
 #workIndicator.working {
     -fx-fill: red;
-    -fx-effect: dropshadow(gaussian, red, 12, 0, 0, 0);
+    -fx-effect: dropshadow(gaussian, red, 6, 0, 0, 0);
+}
+
+/* settings of the controlPositionPanel */
+#controlPositionPanel {
+    -fx-spacing: 10px;
+    -fx-alignment: center;
+}
+#controlPositionPanel #controlZoomPane{
+    -fx-spacing: 10px;
+    -fx-alignment: center-left;
+}
+#controlPositionPanel #controlZoomPane .radio-button{
+/* unknown property without documentation */
+    -fx-mark-highlight-color: DARKSLATEGREY;
+    -fx-mark-color: DARKSLATEGREY;
+    -fx-base: DARKCYAN;
+}
+#controlPositionPanel #controlRotatePane{
+    -fx-spacing: 5px;
+    -fx-alignment: center;
+}
+#controlPositionPanel #controlRotatePane .slider{
+    -fx-pref-width: 100px;
+}
+#controlPositionPanel #controlRotatePane .slider{
+/* unknown property without documentation */
+    -fx-mark-highlight-color: DARKSLATEGREY;
+    -fx-mark-color: DARKSLATEGREY;
+    -fx-base: DARKCYAN;
 }
