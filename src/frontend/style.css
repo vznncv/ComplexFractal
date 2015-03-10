@@ -86,3 +86,9 @@
     -fx-mark-color: DARKSLATEGREY;
     -fx-base: DARKCYAN;
 }
+
+/* setting of the panel for choosing the fractal and the palette */
+#fractalSettingsPanel {
+    -fx-spacing: 10px;
+    -fx-alignment: center;
+}
