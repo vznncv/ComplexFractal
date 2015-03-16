@@ -16,7 +16,7 @@ import java.util.List;
  * @author Kochin Konstantin Alexandrovich
  */
 public class Controller {
-    ComplexFractalDrawer fd;
+    ComplexFractalCanvasDrawer fd;
     // the root node
     //@FXML
     //private GridPane root;
@@ -31,7 +31,7 @@ public class Controller {
      * Initialize function, it will be invoked after the scene graph is loaded.
      */
     public void initialize() {
-        fd = new ComplexFractalDrawer(mainCanvas, new MandelbrotSet());
+        fd = new ComplexFractalCanvasDrawer(mainCanvas, new MandelbrotSet());
         // set indicator of the working
         InvalidationListener updateWorkIndicator = (obs) -> Platform.runLater(() -> {
             boolean status = ((ReadOnlyBooleanProperty) obs).get();
@@ -45,10 +45,4 @@ public class Controller {
         updateWorkIndicator.invalidated(fd.workProperty());
     }
 
-    /**
-     * Repaint canvas.
-     */
-    public void repaintCanvas() {
-
-    }
 }

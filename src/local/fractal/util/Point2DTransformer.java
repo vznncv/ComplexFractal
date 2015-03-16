@@ -27,6 +27,7 @@ public class Point2DTransformer {
 
     /**
      * Create from matrix of the transformation.
+     *
      * @param transMat matrix of the transformation
      */
     private Point2DTransformer(RealMatrix transMat) {
@@ -34,7 +35,7 @@ public class Point2DTransformer {
         if (transMat.getColumnDimension() != 3 && transMat.getRowDimension() != 3) {
             throw new IllegalArgumentException("transMat doesn't have size 3 by 3");
         }
-        this.transMat = transMat;
+        this.transMat = transMat.copy();
     }
 
     /**
@@ -46,6 +47,17 @@ public class Point2DTransformer {
      */
     public static Point2DTransformer mul(Point2DTransformer l, Point2DTransformer r) {
         return new Point2DTransformer(l.transMat.multiply(r.transMat));
+    }
+
+    /**
+     * Get copy of the this object.
+     *
+     * @return copy of the object
+     */
+    public Point2DTransformer copy() {
+        Point2DTransformer copy = new Point2DTransformer();
+        copy.transMat = transMat.copy();
+        return copy;
     }
 
     /**
@@ -112,8 +124,6 @@ public class Point2DTransformer {
         transMat = MatrixUtils.createRealMatrix(mat).multiply(transMat);
         return this;
     }
-
-
 
 
     /**
