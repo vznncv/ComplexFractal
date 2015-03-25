@@ -6,9 +6,7 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.scene.canvas.Canvas;
 import local.fractal.model.ComplexFractal;
 import local.fractal.model.ComplexFractalChecker;
-import local.fractal.util.ComplexFractalDrawer;
-import local.fractal.util.IterativePalette;
-import local.fractal.util.IterativePaletteV1;
+import local.fractal.util.*;
 
 import java.util.Objects;
 
@@ -112,7 +110,7 @@ public class ComplexFractalCanvasDrawer {
      *
      * @param palette palette
      */
-    public synchronized void setPalette(IterativePalette palette) {
+    public void setPalette(IterativePalette palette) {
         complexFractalDrawer.setIterativePalette(palette);
     }
 
@@ -121,7 +119,7 @@ public class ComplexFractalCanvasDrawer {
      *
      * @return complex fractal checker
      */
-    public synchronized ComplexFractalChecker getFractal() {
+    public ComplexFractalChecker getFractal() {
         return complexFractalDrawer.getComplexFractalChecker();
     }
 
@@ -130,7 +128,7 @@ public class ComplexFractalCanvasDrawer {
      *
      * @param fractal complex fractal checker.
      */
-    public synchronized void setFractal(ComplexFractalChecker fractal) {
+    public void setFractal(ComplexFractalChecker fractal) {
         complexFractalDrawer.setComplexFractalChecker(fractal);
     }
 
@@ -139,7 +137,49 @@ public class ComplexFractalCanvasDrawer {
      *
      * @return property indicated calculating of the fractal
      */
-    public synchronized ReadOnlyBooleanProperty workProperty() {
+    public ReadOnlyBooleanProperty workProperty() {
         return complexFractalDrawer.workProperty();
+    }
+
+
+    /**
+     * Perform translate of the fractal on canvas.
+     *
+     * @param dx x translate (in the pixels)
+     * @param dy y translate (in the pixels)
+     */
+    public void translateImage(double dx, double dy) {
+        synchronized (complexFractalDrawer) {
+            // calculate translate in the coordinates of the fractal
+            Point2DTransformer resTr = complexFractalDrawer.getResultingTransform();
+            Point2D p1 = resTr.apply(new Point2D(0, 0));
+            Point2D p2 = resTr.apply(new Point2D(dx, dy));
+            double dxFr = p1.getX() - p2.getX();
+            double dyFr = p1.getY() - p2.getY();
+            // perform translate
+            complexFractalDrawer.setTransform(complexFractalDrawer.getTransform().translation(dxFr, dyFr));
+        }
+    }
+
+    /**
+     * set default scale of the image
+     */
+    public void defaultScaleImage() {
+        complexFractalDrawer.setTransform(Point2DTransformer.CLEAR);
+    }
+
+    /**
+     * Change the scale of the image.
+     * The point with coordinate (x, y) doesn't move.
+     *
+     * @param xScale x scales
+     * @param yScale y scales
+     * @param x      x coordinate of the center scale at canvas
+     * @param y      y coordinate of the center scale at canvas
+     */
+    public synchronized void scaleImage(double xScale, double yScale, double x, double y) {
+        Point2DTransformer resTr = complexFractalDrawer.getResultingTransform();
+        Point2D center = resTr.apply(new Point2D(x, y));
+        complexFractalDrawer.setTransform(complexFractalDrawer.getTransform().scale(xScale, yScale, center));
     }
 }

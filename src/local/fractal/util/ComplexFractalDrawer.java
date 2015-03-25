@@ -24,9 +24,18 @@ public class ComplexFractalDrawer {
      */
     private final int edgeImagePreview = 40;
     /**
+     * Thread pool for drawing fractal.
+     */
+    final private ExecutorService singlePool;
+    /**
      * image with fractal
      */
     private WritableImage image;
+    /**
+     * size of the image
+     */
+    private volatile int width;
+    private volatile int height;
     /**
      * This transform move initial origin of the coordinate thus center of the image has
      * coordinate (centerX, centerY) and:
@@ -37,16 +46,12 @@ public class ComplexFractalDrawer {
      * X axis is directed from left to right;
      * Y axis is directed  from bottom to top.
      */
-    private Point2DTransformer initAxisTransform;
+    private volatile Point2DTransformer preTransform;
     /**
      * Current affine transform of the complex plane.
-     * Apply after initAxisTransform.
+     * Apply after preTransform.
      */
-    private Point2DTransformer transform;
-    /**
-     * Thread pool for drawing fractal.
-     */
-    private ExecutorService singlePool;
+    private volatile Point2DTransformer transform;
     /**
      * It's indicator that fractal is drawing.
      */
@@ -58,8 +63,8 @@ public class ComplexFractalDrawer {
     /**
      * Settings of drawing the fractal.
      */
-    private ComplexFractalChecker complexFractalChecker;
-    private IterativePalette iterativePalette;
+    private volatile ComplexFractalChecker complexFractalChecker;
+    private volatile IterativePalette iterativePalette;
 
 
     /**
@@ -86,31 +91,7 @@ public class ComplexFractalDrawer {
             return t;
         });
         // initialize transform (when transform changed, image needs to be updated)
-        transform = new Point2DTransformer() {
-            @Override
-            public Point2D apply(Point2D point) {
-                changed.set(true);
-                return super.apply(point);
-            }
-
-            @Override
-            public Point2DTransformer translation(double xShift, double yShift) {
-                changed.set(true);
-                return super.translation(xShift, yShift);
-            }
-
-            @Override
-            public Point2DTransformer rotate(double angle) {
-                changed.set(true);
-                return super.rotate(angle);
-            }
-
-            @Override
-            public void clear() {
-                changed.set(true);
-                super.clear();
-            }
-        };
+        transform = Point2DTransformer.CLEAR;
 
         // create image
         resizeImage(width, height);
@@ -225,6 +206,47 @@ public class ComplexFractalDrawer {
     }
 
     /**
+     * Create preliminary transform for image with {@code h} height and {@code w} width.
+     * Origin of it coordinate will be in the center of the image.
+     *
+     * @param w width of the image
+     * @param h height of the image
+     */
+    private static Point2DTransformer getInitialTransform(int w, int h) {
+        // coordinate of the center of the image
+        final double centerX = 0;
+        final double centerY = 0;
+        // maximum radius of the circle that may be placed on the image.
+        final double minR = 1;
+
+        if (h <= 0)
+            throw new IllegalArgumentException("h <= 0");
+        if (w <= 0)
+            throw new IllegalArgumentException("w <= 0");
+
+        Point2DTransformer preTr = Point2DTransformer.CLEAR;
+        if (h > w) {
+            // scale coordinate
+            double scale = 2 * minR / w;
+            preTr = preTr.scale(scale, scale);
+            // move the center of the coordinate
+            preTr = preTr.translation(-minR + centerX, -minR * ((double) h / (double) w) + centerY);
+        } else {
+            // scale coordinate
+            double scale = 2 * minR / h;
+            preTr = preTr.scale(scale, scale);
+            // move the center of the coordinate
+            preTr = preTr.translation(-minR * ((double) w / (double) h) + centerX, -minR + centerY);
+        }
+        // image has x axis from left to right and
+        // y axis from top to bottom.
+        // modify the direction of y coordinate from bottom to top
+        preTr.scale(1, -1);
+
+        return preTr;
+    }
+
+    /**
      * Get current image. Image may be incomplete. This image may be changed.
      * If it require that image isn't modified other threads, synchronize the object that return this image.
      *
@@ -244,6 +266,24 @@ public class ComplexFractalDrawer {
     }
 
     /**
+     * Get width of the current image.
+     *
+     * @return width
+     */
+    public int getImageWidth() {
+        return width;
+    }
+
+    /**
+     * Get height of the current image.
+     *
+     * @return height
+     */
+    public int getImageHeight() {
+        return height;
+    }
+
+    /**
      * Resize image.
      *
      * @param w new width of the image
@@ -251,52 +291,14 @@ public class ComplexFractalDrawer {
      */
     public synchronized void resizeImage(int w, int h) {
         // get new initial transform
-        initAxisTransform = getInitialTransform(w, h);
+        preTransform = getInitialTransform(w, h);
         // create new image
         image = new WritableImage(w, h);
+        // save width and height of the image
+        height = h;
+        width = w;
         // redraw image
         changed.set(true);
-    }
-
-    /**
-     * Create initial transform for image with {@code h} height and {@code w} width.
-     * Origin of it coordinate will be in the center of the image.
-     *
-     * @param w width of the image
-     * @param h height of the image
-     */
-    private Point2DTransformer getInitialTransform(int w, int h) {
-        // coordinate of the center of the image
-        final double centerX = 0;
-        final double centerY = 0;
-        // maximum radius of the circle that may be placed on the image.
-        final double minR = 1;
-
-        if (h <= 0)
-            throw new IllegalArgumentException("h <= 0");
-        if (w <= 0)
-            throw new IllegalArgumentException("w <= 0");
-
-        Point2DTransformer initTr = new Point2DTransformer();
-        if (h > w) {
-            // scale coordinate
-            double scale = 2 * minR / w;
-            initTr.scale(scale, scale);
-            // move the center of the coordinate
-            initTr.translation(-minR + centerX, -minR * ((double) h / (double) w) + centerY);
-        } else {
-            // scale coordinate
-            double scale = 2 * minR / h;
-            initTr.scale(scale, scale);
-            // move the center of the coordinate
-            initTr.translation(-minR * ((double) w / (double) h) + centerX, -minR + centerY);
-        }
-        // image has x axis from left to right and
-        // y axis from top to bottom.
-        // modify the direction of y coordinate from bottom to top
-        initTr.scale(1, -1);
-
-        return initTr;
     }
 
     /**
@@ -304,7 +306,7 @@ public class ComplexFractalDrawer {
      *
      * @return fractal checker
      */
-    public synchronized ComplexFractalChecker getComplexFractalChecker() {
+    public ComplexFractalChecker getComplexFractalChecker() {
         return complexFractalChecker;
     }
 
@@ -323,7 +325,7 @@ public class ComplexFractalDrawer {
      *
      * @return iterative palette
      */
-    public synchronized IterativePalette getIterativePalette() {
+    public IterativePalette getIterativePalette() {
         return iterativePalette;
     }
 
@@ -342,7 +344,7 @@ public class ComplexFractalDrawer {
      *
      * @return current transform
      */
-    public synchronized Point2DTransformer getTransform() {
+    public Point2DTransformer getTransform() {
         return transform;
     }
 
@@ -351,8 +353,36 @@ public class ComplexFractalDrawer {
      *
      * @param transform new transform
      */
-    public synchronized void setTransform(Point2DTransformer transform) {
-        this.transform = transform;
+    public void setTransform(Point2DTransformer transform) {
+        Objects.requireNonNull(transform, "transform is null");
+        if (!this.transform.equals(transform)) {
+            this.transform = transform;
+            synchronized (this) {
+                changed.set(true);
+            }
+        }
+    }
+
+
+    /**
+     * Get coordinate of the center of the image.
+     *
+     * @return coordinate of the center of the image after transformation.
+     */
+    public Point2D getCenterCorrdinate() {
+        return transform.apply(
+                preTransform.apply(
+                        new Point2D(getImageWidth() / 2.0, getImageHeight() / 2.0)
+                ));
+    }
+
+    /**
+     * Get resulting transform for image.
+     *
+     * @return resulting transformer
+     */
+    public Point2DTransformer getResultingTransform() {
+        return preTransform.addAfter(transform);
     }
 
     /**
@@ -375,27 +405,28 @@ public class ComplexFractalDrawer {
         ComplexFractalChecker cFrCh;
         IterativePalette itPl;
         Point2DTransformer tr;
-        Point2DTransformer initTr;
+        Point2DTransformer resTr;
         int w;
         int h;
         synchronized (this) {
             // get current setting of the fractal
-            w = (int) image.getWidth();
-            h = (int) image.getHeight();
+            w = getImageWidth();
+            h = getImageHeight();
             cFrCh = getComplexFractalChecker();
             itPl = getIterativePalette();
-            tr = getTransform().copy();
-            initTr = initAxisTransform.copy();
+            tr = getTransform();
+            resTr = getResultingTransform();
             // changes has accepted to processing
             changed.set(false);
             // start working
             work.set(true);
-            // draw preview of the fractal
-            drawPreview(tr, cFrCh, itPl);
         }
 
+        // draw preview of the fractal
+        drawPreview(tr, cFrCh, itPl);
+
         // draw fractal
-        drawFractalFull(w, h, Point2DTransformer.mul(initTr, tr), cFrCh, itPl);
+        drawFractalFull(w, h, resTr, cFrCh, itPl);
 
         synchronized (this) {
             // if thread draw fractal fully then working has been finished
@@ -408,7 +439,7 @@ public class ComplexFractalDrawer {
     /**
      * Draw preview of the fractal.
      *
-     * @param tr  transform of the point (without initAxisTransform)
+     * @param tr  transform of the point (without preTransform)
      * @param fCh checker of the fractal
      * @param pl  palette
      */
@@ -428,7 +459,7 @@ public class ComplexFractalDrawer {
         // create the small preview image
         WritableImage previewImage = new WritableImage(wPr, hPr);
         PixelWriter pwPreview = previewImage.getPixelWriter();
-        Point2DTransformer resTr = Point2DTransformer.mul(getInitialTransform(wPr, hPr), tr);
+        Point2DTransformer resTr = getInitialTransform(wPr, hPr).addAfter(tr);
         for (int i = 0; i < hPr; i++) {
             Color[] colors = calculateLine(i, wPr, resTr, fCh, pl);
             for (int j = 0; j < wPr; j++) {
@@ -437,7 +468,9 @@ public class ComplexFractalDrawer {
         }
 
         // rescale image
-        bilinearInterpolation(previewImage, image);
+        synchronized (this) {
+            bilinearInterpolation(previewImage, image);
+        }
     }
 
     /**
@@ -445,7 +478,7 @@ public class ComplexFractalDrawer {
      *
      * @param w   width of the image
      * @param h   height of the image
-     * @param tr  transform of the point (with initAxisTransform)
+     * @param tr  transform of the point (with preTransform)
      * @param fCh checker of the fractal
      * @param pl  palette
      */

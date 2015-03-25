@@ -13,7 +13,9 @@
 
     <!-- canvas for drawing the fractal -->
     <center>
-        <Canvas fx:id="mainCanvas" height="${root.height-150}" width="${root.width-40}"/>
+        <Canvas fx:id="mainCanvas" height="${root.height-150}" width="${root.width-40}"
+                onMouseDragged="#translateFractal" onMousePressed="#translateFractalStart"
+                onMouseClicked="#scaleFractal"/>
     </center>
 
     <!-- control elements -->
@@ -30,7 +32,8 @@
 
                         <!-- restore default setting -->
                         <Button fx:id="restoreDefaultButton" text="Default"
-                                GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.rowSpan="2">
+                                GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.rowSpan="2"
+                                onAction="#defaultScale">
                             <tooltip>
                                 <Tooltip text="Restore default zoom and position."/>
                             </tooltip>
@@ -42,44 +45,19 @@
                                 <fx:define>
                                     <ToggleGroup fx:id="zoomToggleGroup"/>
                                 </fx:define>
-                                <RadioButton text="Zoom in" toggleGroup="$zoomToggleGroup" selected="true">
+                                <RadioButton fx:id="zoomInRadioButton" text="Zoom in" toggleGroup="$zoomToggleGroup"
+                                             selected="true">
                                     <tooltip>
                                         <Tooltip text="Zoom in into 2 times. Left-click on canvas to zoom in."/>
                                     </tooltip>
                                 </RadioButton>
-                                <RadioButton text="Zoom out" toggleGroup="$zoomToggleGroup">
+                                <RadioButton fx:id="zoomOutRadioButton" text="Zoom out" toggleGroup="$zoomToggleGroup">
                                     <tooltip>
                                         <Tooltip text="Zoom out into 2 times. Left-click on canvas to zoom out."/>
                                     </tooltip>
                                 </RadioButton>
                             </children>
                         </VBox>
-
-                        <!-- control of the translation -->
-                        <GridPane fx:id="controlTranslationPane">
-                            <children>
-                                <Button text="↑" GridPane.rowIndex="0" GridPane.columnIndex="1">
-                                    <tooltip>
-                                        <Tooltip text="Move up by half."/>
-                                    </tooltip>
-                                </Button>
-                                <Button text="→" GridPane.rowIndex="1" GridPane.columnIndex="2">
-                                    <tooltip>
-                                        <Tooltip text="Move right by half."/>
-                                    </tooltip>
-                                </Button>
-                                <Button text="↓" GridPane.rowIndex="2" GridPane.columnIndex="1">
-                                    <tooltip>
-                                        <Tooltip text="Move down by half."/>
-                                    </tooltip>
-                                </Button>
-                                <Button text="←" GridPane.rowIndex="1" GridPane.columnIndex="0">
-                                    <tooltip>
-                                        <Tooltip text="Move left by half"/>
-                                    </tooltip>
-                                </Button>
-                            </children>
-                        </GridPane>
 
                         <!-- control of the rotate -->
                         <VBox fx:id="controlRotatePane">

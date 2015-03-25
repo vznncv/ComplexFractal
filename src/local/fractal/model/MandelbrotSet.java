@@ -21,7 +21,7 @@ public class MandelbrotSet extends ComplexFractal {
 
     /**
      * Check that point belongs Mandelbrot set. If it's true then return 0, else number of iteration when point cross
-     * bound (|z| >= rBound).
+     * bound {@literal (|z| >= rBound)}.
      *
      * @param z complex number
      * @return 0 if it's fractal point or number of the iteration

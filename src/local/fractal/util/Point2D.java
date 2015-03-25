@@ -7,7 +7,7 @@ import org.apache.commons.math3.complex.Complex;
  *
  * @author Kochin Konstantin Alexandrovich
  */
-public class Point2D {
+final public class Point2D {
     /**
      * x coordinate
      */
