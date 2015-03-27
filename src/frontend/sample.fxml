@@ -13,9 +13,9 @@
 
     <!-- canvas for drawing the fractal -->
     <center>
-        <Canvas fx:id="mainCanvas" height="${root.height-150}" width="${root.width-40}"
-                onMouseDragged="#translateFractal" onMousePressed="#translateFractalStart"
-                onMouseClicked="#scaleFractal"/>
+        <Canvas fx:id="mainCanvas" height="${root.height-120}" width="${root.width-40}"
+                onMouseDragged="#canvasMouseDrag" onMousePressed="#canvasMousePressed"
+                onMouseClicked="#canvasMouseClicked"/>
     </center>
 
     <!-- control elements -->
@@ -26,6 +26,8 @@
                 <!-- working indicator -->
                 <Circle fx:id="workIndicator" radius="10"/>
 
+                <Separator orientation="VERTICAL"/>
+
                 <!-- control of the zoom and position panel -->
                 <HBox fx:id="controlPositionPanel">
                     <children>
@@ -33,7 +35,7 @@
                         <!-- restore default setting -->
                         <Button fx:id="restoreDefaultButton" text="Default"
                                 GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.rowSpan="2"
-                                onAction="#defaultScale">
+                                onAction="#canvasDefaultScale">
                             <tooltip>
                                 <Tooltip text="Restore default zoom and position."/>
                             </tooltip>
@@ -59,17 +61,32 @@
                             </children>
                         </VBox>
 
-                        <!-- control of the rotate -->
-                        <VBox fx:id="controlRotatePane">
+                        <!-- control of the rotate and shift -->
+                        <VBox fx:id="controlRotateShiftPane">
                             <children>
-                                <Label text="rotation"/>
-                                <Slider orientation="HORIZONTAL"/>
-                                <Label text="value"/>
+                                <fx:define>
+                                    <ToggleGroup fx:id="rotateShiftToggleGroup"/>
+                                </fx:define>
+                                <RadioButton fx:id="shiftRadioButton" text="Shift image"
+                                             toggleGroup="$rotateShiftToggleGroup"
+                                             selected="true">
+                                    <tooltip>
+                                        <Tooltip text="Drag image for shift."/>
+                                    </tooltip>
+                                </RadioButton>
+                                <RadioButton fx:id="roteateRadioButton" text="Rotate image"
+                                             toggleGroup="$rotateShiftToggleGroup">
+                                    <tooltip>
+                                        <Tooltip text="Drag image for rotate."/>
+                                    </tooltip>
+                                </RadioButton>
                             </children>
                         </VBox>
 
                     </children>
                 </HBox>
+
+                <Separator orientation="VERTICAL"/>
 
                 <!-- fractal and palette settings -->
                 <VBox fx:id="fractalSettingsPanel">
@@ -85,6 +102,7 @@
                     </Button>
                 </VBox>
 
+                <Separator orientation="VERTICAL"/>
 
                 <!-- save current image to the file -->
                 <Button text="Save">

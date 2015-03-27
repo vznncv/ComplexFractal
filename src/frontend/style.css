@@ -4,15 +4,15 @@
     -fx-padding: 5px;
 }
 
-/* borders and padding of the control panels */
-#controlPanel,
-#controlPositionPanel,
-#fractalSettingsPanel{
+/* borders and padding of the control panel */
+#controlPanel {
     -fx-border-width: 2px;
     -fx-border-color: DARKSLATEGREY;
     -fx-border-radius: 5px;
     -fx-padding: 5px;
     -fx-effect: dropshadow(gaussian, DARKSLATEGREY, 4, 0, 0, 0);
+    -fx-alignment: center;
+    -fx-spacing: 8px;
 }
 
 /* unlimited size of the all buttons */
@@ -21,6 +21,14 @@
     -fx-max-width: 9999;
 }
 
+/* common style for separators */
+#controlPanel .separator .line {
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-radius: 2px;
+    -fx-border-color: DARKSLATEGREY;
+     -fx-effect: dropshadow(gaussian, DARKSLATEGREY, 4, 0, 0, 0);
+}
 /* common style for buttons */
 .button {
     -fx-text-fill: white;
@@ -33,20 +41,18 @@
 .button:pressed {
     -fx-background-color: linear-gradient(#54818C, #172E32);
 }
-
-/* common style for labels and radio buttons */
+/* common style of the text for labels and radio buttons */
 .label, .radio-button {
     -fx-text-fill: white;
     -fx-font-family: "Arial Narrow";
 }
-
-
-/* settings of the main panel */
-#controlPanel {
-    -fx-alignment: center;
-    -fx-spacing: 8px;
+/* common style for radio buttons */
+.radio-button {
+    /* unknown property without documentation */
+    -fx-mark-highlight-color: DARKSLATEGREY;
+    -fx-mark-color: DARKSLATEGREY;
+    -fx-base: DARKCYAN;
 }
-
 
 /* style of the indicator of the work */
 #workIndicator.waiting {
@@ -58,33 +64,15 @@
     -fx-effect: dropshadow(gaussian, red, 6, 0, 0, 0);
 }
 
-/* settings of the controlPositionPanel */
+
+/* setting of the control position panel */
 #controlPositionPanel {
     -fx-spacing: 10px;
-    -fx-alignment: center;
 }
-#controlPositionPanel #controlZoomPane{
+#controlPositionPanel #controlZoomPane,
+#controlPositionPanel #controlRotateShiftPane {
     -fx-spacing: 10px;
     -fx-alignment: center-left;
-}
-#controlPositionPanel #controlZoomPane .radio-button{
-/* unknown property without documentation */
-    -fx-mark-highlight-color: DARKSLATEGREY;
-    -fx-mark-color: DARKSLATEGREY;
-    -fx-base: DARKCYAN;
-}
-#controlPositionPanel #controlRotatePane{
-    -fx-spacing: 5px;
-    -fx-alignment: center;
-}
-#controlPositionPanel #controlRotatePane .slider{
-    -fx-pref-width: 100px;
-}
-#controlPositionPanel #controlRotatePane .slider{
-/* unknown property without documentation */
-    -fx-mark-highlight-color: DARKSLATEGREY;
-    -fx-mark-color: DARKSLATEGREY;
-    -fx-base: DARKCYAN;
 }
 
 /* setting of the panel for choosing the fractal and the palette */

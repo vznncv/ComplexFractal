@@ -177,9 +177,19 @@ public class ComplexFractalCanvasDrawer {
      * @param x      x coordinate of the center scale at canvas
      * @param y      y coordinate of the center scale at canvas
      */
-    public synchronized void scaleImage(double xScale, double yScale, double x, double y) {
+    public void scaleImage(double xScale, double yScale, double x, double y) {
         Point2DTransformer resTr = complexFractalDrawer.getResultingTransform();
         Point2D center = resTr.apply(new Point2D(x, y));
         complexFractalDrawer.setTransform(complexFractalDrawer.getTransform().scale(xScale, yScale, center));
+    }
+
+    /**
+     * rotate image relative to the center of the image
+     *
+     * @param angle angle of rotate
+     */
+    public void rotateImage(double angle) {
+        Point2D center = complexFractalDrawer.getCenterCorrdinate();
+        complexFractalDrawer.setTransform(complexFractalDrawer.getTransform().rotate(angle, center));
     }
 }
