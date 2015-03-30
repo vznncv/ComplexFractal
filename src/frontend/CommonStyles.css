@@ -1,0 +1,53 @@
+/* common styles for all elements */
+* {
+    -fx-base: DARKCYAN;
+}
+/* font settings */
+.text {
+    -fx-font-family: "Arial Narrow";
+}
+
+
+/* styles for buttons */
+.button {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-color: linear-gradient(#61A2B1, #2A5058);
+    -fx-effect: innershadow(three-pass-box, rgba(0, 0, 0, 1), 4, 0, 0, 2);
+    -fx-background-radius: 10px;
+}
+.button:pressed {
+    -fx-background-color: linear-gradient(#54818C, #172E32);
+}
+/* styles for labels */
+.labels {
+    -fx-text-fill: white;
+}
+/* styles for radio-buttons */
+.radio-button {
+    -fx-text-fill: white;
+    -fx-mark-highlight-color: DARKSLATEGREY;
+}
+/* common style for separators */
+.separator .line {
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+    -fx-border-radius: 2px;
+    -fx-border-color: DARKSLATEGREY;
+    -fx-effect: dropshadow(gaussian, DARKSLATEGREY, 4, 0, 0, 0);
+}
+
+/* style of border for panels */
+.borderControlPanel {
+    -fx-border-width: 2px;
+    -fx-border-color: DARKSLATEGREY;
+    -fx-border-radius: 5px;
+    -fx-padding: 5px;
+    -fx-effect: dropshadow(gaussian, DARKSLATEGREY, 4, 0, 0, 0);
+}
+
+/* unlimited size of the all buttons */
+.button {
+    -fx-max-height: 9999;
+    -fx-max-width: 9999;
+}

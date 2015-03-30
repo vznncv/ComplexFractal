@@ -1,57 +1,13 @@
-/* root element (BorderPane)*/
+/* style of the root element (BorderPane)*/
 .root {
     -fx-background-image: url("background.png");
     -fx-padding: 5px;
 }
 
-/* borders and padding of the control panel */
+/* style for control panel */
 #controlPanel {
-    -fx-border-width: 2px;
-    -fx-border-color: DARKSLATEGREY;
-    -fx-border-radius: 5px;
-    -fx-padding: 5px;
-    -fx-effect: dropshadow(gaussian, DARKSLATEGREY, 4, 0, 0, 0);
     -fx-alignment: center;
     -fx-spacing: 8px;
-}
-
-/* unlimited size of the all buttons */
-.button {
-    -fx-max-height: 9999;
-    -fx-max-width: 9999;
-}
-
-/* common style for separators */
-#controlPanel .separator .line {
-    -fx-border-style: solid;
-    -fx-border-width: 1px;
-    -fx-border-radius: 2px;
-    -fx-border-color: DARKSLATEGREY;
-     -fx-effect: dropshadow(gaussian, DARKSLATEGREY, 4, 0, 0, 0);
-}
-/* common style for buttons */
-.button {
-    -fx-text-fill: white;
-    -fx-font-family: "Arial Narrow";
-    -fx-font-weight: bold;
-    -fx-background-color: linear-gradient(#61A2B1, #2A5058);
-    -fx-effect: innershadow(three-pass-box, rgba(0, 0, 0, 1), 4, 0, 0, 2);
-    -fx-background-radius: 10px;
-}
-.button:pressed {
-    -fx-background-color: linear-gradient(#54818C, #172E32);
-}
-/* common style of the text for labels and radio buttons */
-.label, .radio-button {
-    -fx-text-fill: white;
-    -fx-font-family: "Arial Narrow";
-}
-/* common style for radio buttons */
-.radio-button {
-    /* unknown property without documentation */
-    -fx-mark-highlight-color: DARKSLATEGREY;
-    -fx-mark-color: DARKSLATEGREY;
-    -fx-base: DARKCYAN;
 }
 
 /* style of the indicator of the work */
@@ -63,7 +19,6 @@
     -fx-fill: red;
     -fx-effect: dropshadow(gaussian, red, 6, 0, 0, 0);
 }
-
 
 /* setting of the control position panel */
 #controlPositionPanel {

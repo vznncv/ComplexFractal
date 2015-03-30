@@ -11,6 +11,10 @@
         <URL value="@style.css"/>
     </stylesheets>
 
+    <stylesheets>
+        <URL value="@CommonStyles.css"/>
+    </stylesheets>
+
     <!-- canvas for drawing the fractal -->
     <center>
         <Canvas fx:id="mainCanvas" height="${root.height-120}" width="${root.width-40}"
@@ -20,7 +24,7 @@
 
     <!-- control elements -->
     <bottom>
-        <HBox fx:id="controlPanel">
+        <HBox fx:id="controlPanel" styleClass="borderControlPanel">
             <children>
 
                 <!-- working indicator -->
