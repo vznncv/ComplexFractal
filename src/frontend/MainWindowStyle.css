@@ -1,9 +1,3 @@
-/* style of the root element (BorderPane)*/
-.root {
-    -fx-background-image: url("background.png");
-    -fx-padding: 5px;
-}
-
 /* style for control panel */
 #controlPanel {
     -fx-alignment: center;

@@ -6,14 +6,12 @@
 <?import javafx.scene.shape.Circle?>
 <?import java.net.URL?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefHeight="600" prefWidth="800"
-            xmlns="http://javafx.com/javafx/8" fx:controller="local.fractal.Controller">
-    <stylesheets>
-        <URL value="@style.css"/>
-    </stylesheets>
-
+            xmlns="http://javafx.com/javafx/8" fx:controller="local.fractal.MainWindowController">
     <stylesheets>
         <URL value="@CommonStyles.css"/>
+        <URL value="@MainWindowStyle.css"/>
     </stylesheets>
+
 
     <!-- canvas for drawing the fractal -->
     <center>
@@ -109,7 +107,7 @@
                 <Separator orientation="VERTICAL"/>
 
                 <!-- save current image to the file -->
-                <Button text="Save">
+                <Button text="Save" onAction="#openSaveDialog">
                     <tooltip>
                         <Tooltip text="Save current view"/>
                     </tooltip>

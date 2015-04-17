@@ -1,0 +1,20 @@
+/* style of the panel with buttons save and cancel */
+#actionPanel {
+    -fx-alignment: center;
+    -fx-spacing: 10px;
+}
+
+/* setting of the GridPane */
+#grid {
+    -fx-hgap: 10px;
+    -fx-vgap: 10px;
+    -fx-max-width: 380px;
+    -fx-max-height: 160px;
+    -fx-pref-width: 380px;
+    -fx-pref-height: 160px;
+}
+
+/* setting of the progress bar */
+#progress {
+    -fx-pref-width: 380px;
+}

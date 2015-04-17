@@ -7,6 +7,12 @@
     -fx-font-family: "Arial Narrow";
 }
 
+/* style of the root element */
+.root {
+    -fx-background-image: url("background.png");
+    -fx-padding: 5px;
+}
+
 
 /* styles for buttons */
 .button {
@@ -20,7 +26,7 @@
     -fx-background-color: linear-gradient(#54818C, #172E32);
 }
 /* styles for labels */
-.labels {
+.label {
     -fx-text-fill: white;
 }
 /* styles for radio-buttons */

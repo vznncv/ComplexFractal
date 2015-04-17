@@ -5,13 +5,19 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Circle;
+import javafx.stage.Stage;
 import local.fractal.model.MandelbrotSet;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.List;
 
 /**
@@ -19,9 +25,12 @@ import java.util.List;
  *
  * @author Kochin Konstantin Alexandrovich
  */
-public class Controller {
+public class MainWindowController {
+    // Main window
+    private Stage mainWindows;
+
     // Drawer of the fractal
-    ComplexFractalCanvasDrawer fd;
+    private ComplexFractalCanvasDrawer fd;
     // canvas for painting
     @FXML
     private Canvas mainCanvas;
@@ -38,6 +47,37 @@ public class Controller {
     // coordinate of the mouse over the canvas
     private double xMouseCanvas;
     private double yMouseCanvas;
+
+    /**
+     * Load scene for the window and show it.
+     *
+     * @param stage stage for scene
+     * @return controller of this window
+     */
+    public static MainWindowController createWindow(Stage stage) {
+        // load the graph scene
+        FXMLLoader fxmlLoader = new FXMLLoader(MainWindowController.class.getResource("/frontend/MainWindow.fxml"));
+        Parent root;
+        try {
+            root = fxmlLoader.load();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        // create and set scene
+        stage.setScene(new Scene(root));
+        // set title of the window
+        stage.setTitle("Fractals");
+        // set minimal size of window
+        stage.minWidthProperty().set(600);
+        stage.minHeightProperty().set(400);
+        // get controller and initialize his field mainWindow
+        MainWindowController controller = fxmlLoader.getController();
+        controller.mainWindows = stage;
+        // show windows
+        stage.show();
+
+        return controller;
+    }
 
     /**
      * Initialize function, it will be invoked after the scene graph is loaded.
@@ -157,5 +197,15 @@ public class Controller {
             else
                 fd.scaleImage(2, 2, event.getX(), event.getY());
         }
+    }
+
+    /**
+     * Open save dialog
+     *
+     * @param actionEvent button event
+     */
+    public void openSaveDialog(ActionEvent actionEvent) throws IOException {
+        // show open save dialog
+        SaveDialogController.showDialog(mainWindows, fd);
     }
 }
