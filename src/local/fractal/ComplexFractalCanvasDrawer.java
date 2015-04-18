@@ -1,17 +1,22 @@
 package local.fractal;
 
 import javafx.animation.AnimationTimer;
-import javafx.beans.InvalidationListener;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.image.WritableImage;
 import local.fractal.model.ComplexFractal;
 import local.fractal.model.ComplexFractalChecker;
 import local.fractal.util.*;
 
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
- * This class draws fractal in background thread.
+ * This class {@ComplexFractalCanvasDrawer} draws fractal in background thread on the canvas.
  *
  * @author Kochin Konstantin Alexandrovich
  */
@@ -21,21 +26,54 @@ public class ComplexFractalCanvasDrawer {
      */
     private static final long maxFPS = 24;
     /**
-     * Object for render fractal to the inner buffer
+     * It's minimal size of the height and width of preview image of the fractal
      */
-    private final ComplexFractalDrawer complexFractalDrawer;
+    private final int edgeImagePreview = 40;
+    /**
+     * It's helper object for drawing the fractal to the buffer.
+     */
+    private ComplexFractalDrawer complexFractalDrawer = new ComplexFractalDrawer();
+    /**
+     * Settings of drawing the fractal.
+     */
+    private ComplexFractalChecker complexFractalChecker;
+    private IterativePalette iterativePalette;
+    /**
+     * Buffer image with fractal.
+     */
+    private WritableImage imageBuffer;
+    /**
+     * Current affine transform of the complex plane.
+     */
+    private Point2DTransformer transform;
+    /**
+     * Canvas for drawing.
+     */
+    private Canvas canvas;
     /**
      * Timer for render flush current image of the fractal to the canvas.
      */
     private AnimationTimer animationTimer;
     /**
-     * Canvas for drawing.
+     * Thread pool for drawing fractal.
      */
-    private Canvas canvas;
+    private ExecutorService singlePool = Executors.newSingleThreadExecutor((task) -> {
+        Thread t = new Thread(task);
+        t.setDaemon(true);
+        return t;
+    });
+    /**
+     * It's indicator that fractal is drawing.
+     */
+    private ReadOnlyBooleanWrapper workProperty = new ReadOnlyBooleanWrapper(false);
+    /**
+     * It's indicator that fractal is changed and image need to update.
+     */
+    private BooleanProperty changedProperty = new SimpleBooleanProperty(false);
 
 
     /**
-     * {@code ComplexFractalDrawer} is helper class for drawing fractal.
+     * {@code ComplexFractalCanvasDrawer} is helper class for drawing fractal on canvas.
      *
      * @param canvas  canvas for drawing
      * @param fractal complex fractal for drawing
@@ -44,6 +82,31 @@ public class ComplexFractalCanvasDrawer {
     public ComplexFractalCanvasDrawer(Canvas canvas, ComplexFractalChecker fractal, IterativePalette palette) {
         // store canvas
         this.canvas = Objects.requireNonNull(canvas, "canvas is null");
+        // store the fractal settings
+        setFractal(fractal);
+        setPalette(palette);
+        // initialize transform
+        transform = Point2DTransformer.CLEAR;
+
+        // initialize image buffer
+        resizeImage();
+        // resize fractal, when canvas will be resized
+        this.canvas.heightProperty().addListener(e -> resizeImage());
+        this.canvas.widthProperty().addListener(e -> resizeImage());
+
+        // when changedProperty is set to the true, start redrawing the image
+        changedProperty.addListener((obj, oldVal, newVal) -> {
+            if (newVal) {
+                // stop drawing in complexFractalDrawer
+                complexFractalDrawer.setPermitWork(false);
+                // redraw the fractal
+                singlePool.execute(this::drawFractal);
+            }
+        });
+        // start redrawing the fractal
+        changedProperty.set(false);
+        changedProperty.set(true);
+
 
         // covert maxFPS to time in the nanosecond between the frames
         final long timeInterval = 1_000_000_000 / maxFPS;
@@ -51,7 +114,7 @@ public class ComplexFractalCanvasDrawer {
         animationTimer = new AnimationTimer() {
             // time of the prevision starting of the timer
             private long prevFrame = System.nanoTime();
-            // indicator that fractal is drawing by complexFractalDrawer
+            // indicator that fractal is drawing by complexFractalDrawer2
             private boolean fractalIsComplete = false;
 
             @Override
@@ -59,29 +122,19 @@ public class ComplexFractalCanvasDrawer {
                 // limit fps
                 if (now > prevFrame + timeInterval) {
                     prevFrame = now;
-                    boolean isWork = complexFractalDrawer.workProperty().get();
+                    boolean isWork = workProperty().get();
                     // draw the fractal
                     if (!fractalIsComplete || isWork) {
-                        synchronized (complexFractalDrawer) {
-                            canvas.getGraphicsContext2D().drawImage(complexFractalDrawer.getCurrentImage(), 0, 0);
+                        WritableImage im = getImageBuffer();
+                        synchronized (im) {
+                            canvas.getGraphicsContext2D().drawImage(im, 0, 0);
                         }
                     }
                     fractalIsComplete = !isWork;
                 }
             }
         };
-        // create complexFractalDrawer
-        int wInit = Math.max(1, (int) canvas.getWidth());
-        int hInit = Math.max(1, (int) canvas.getHeight());
-        complexFractalDrawer = new ComplexFractalDrawer(wInit, hInit, fractal, palette);
-        // resize fractal, when canvas will be resized
-        InvalidationListener canvasResize = (cnv) -> {
-            int w = Math.max(1, (int) canvas.getWidth());
-            int h = Math.max(1, (int) canvas.getHeight());
-            complexFractalDrawer.resizeImage(w, h);
-        };
-        this.canvas.heightProperty().addListener(canvasResize);
-        this.canvas.widthProperty().addListener(canvasResize);
+
         // start the timer
         animationTimer.start();
     }
@@ -96,22 +149,24 @@ public class ComplexFractalCanvasDrawer {
         this(canvas, fractal, new IterativePaletteV1());
     }
 
+
     /**
      * Get current palette.
      *
      * @return palette.
      */
-    public IterativePalette getPalette() {
-        return complexFractalDrawer.getIterativePalette();
+    public synchronized IterativePalette getPalette() {
+        return iterativePalette;
     }
 
     /**
      * Set new palette.
      *
-     * @param palette palette
+     * @param iterativePalette palette
      */
-    public void setPalette(IterativePalette palette) {
-        complexFractalDrawer.setIterativePalette(palette);
+    public synchronized void setPalette(IterativePalette iterativePalette) {
+        this.iterativePalette = Objects.requireNonNull(iterativePalette);
+        changedProperty.set(true);
     }
 
     /**
@@ -119,18 +174,98 @@ public class ComplexFractalCanvasDrawer {
      *
      * @return complex fractal checker
      */
-    public ComplexFractalChecker getFractal() {
-        return complexFractalDrawer.getComplexFractalChecker();
+    public synchronized ComplexFractalChecker getFractal() {
+        return complexFractalChecker;
     }
 
     /**
      * Set new complex fractal checker.
      *
-     * @param fractal complex fractal checker.
+     * @param complexFractalChecker complex fractal checker.
      */
-    public void setFractal(ComplexFractalChecker fractal) {
-        complexFractalDrawer.setComplexFractalChecker(fractal);
+    public synchronized void setFractal(ComplexFractalChecker complexFractalChecker) {
+        this.complexFractalChecker = Objects.requireNonNull(complexFractalChecker);
+        changedProperty.set(true);
     }
+
+    /**
+     * Get current transform of the axis.
+     *
+     * @return current transform
+     */
+    public synchronized Point2DTransformer getTransform() {
+        return transform;
+    }
+
+    /**
+     * Set current transform of the axis.
+     *
+     * @param transform new transform
+     */
+    public synchronized void setTransform(Point2DTransformer transform) {
+        Objects.requireNonNull(transform);
+        if (!this.transform.equals(transform)) {
+            this.transform = transform;
+            changedProperty.set(true);
+        }
+    }
+
+    /**
+     * Get image buffer
+     *
+     * @return image buffer
+     */
+    private synchronized WritableImage getImageBuffer() {
+        return imageBuffer;
+    }
+
+    /**
+     * Set new image buffer.
+     *
+     * @param imageBuffer image buffer
+     */
+    private synchronized void setImageBuffer(WritableImage imageBuffer) {
+        this.imageBuffer = Objects.requireNonNull(imageBuffer);
+        changedProperty.set(true);
+    }
+
+    /**
+     * Get width of current image buffer
+     *
+     * @return width
+     */
+    private synchronized int getImageBufferWidth() {
+        return (int) getImageBuffer().getWidth();
+    }
+
+    /**
+     * Get height of current image buffer
+     *
+     * @return height
+     */
+    private synchronized int getImageBufferHeigth() {
+        return (int) getImageBuffer().getHeight();
+    }
+
+    /**
+     * Resize buffer image to canvas size.
+     */
+    private void resizeImage() {
+        // canvas can have zero size, because minimal size of the image limit 1 by 1
+        int w = Math.max(1, (int) canvas.getWidth());
+        int h = Math.max(1, (int) canvas.getHeight());
+        setImageBuffer(new WritableImage(w, h));
+    }
+
+    /**
+     * Check that image is changed.
+     *
+     * @return {@code true} if image (fractal) is changed otherwise {@code false}
+     */
+    private synchronized boolean isImageChanged() {
+        return changedProperty.get();
+    }
+
 
     /**
      * Get property indicated that fractal is drawing.
@@ -138,7 +273,17 @@ public class ComplexFractalCanvasDrawer {
      * @return property indicated calculating of the fractal
      */
     public ReadOnlyBooleanProperty workProperty() {
-        return complexFractalDrawer.workProperty();
+        return workProperty.getReadOnlyProperty();
+    }
+
+
+    /**
+     * Get resulting transform for image (with pixels coordinate);
+     *
+     * @return resulting transformer
+     */
+    private Point2DTransformer getResultingTransform() {
+        return ImageUtils.calculateInitialTransform(getImageBufferWidth(), getImageBufferHeigth()).addAfter(getTransform());
     }
 
 
@@ -149,23 +294,20 @@ public class ComplexFractalCanvasDrawer {
      * @param dy y translate (in the pixels)
      */
     public void translateImage(double dx, double dy) {
-        synchronized (complexFractalDrawer) {
-            // calculate translate in the coordinates of the fractal
-            Point2DTransformer resTr = complexFractalDrawer.getResultingTransform();
-            Point2D p1 = resTr.apply(new Point2D(0, 0));
-            Point2D p2 = resTr.apply(new Point2D(dx, dy));
-            double dxFr = p1.getX() - p2.getX();
-            double dyFr = p1.getY() - p2.getY();
-            // perform translate
-            complexFractalDrawer.setTransform(complexFractalDrawer.getTransform().translation(dxFr, dyFr));
-        }
+        Point2DTransformer resTr = getResultingTransform();
+        Point2D p1 = resTr.apply(new Point2D(0, 0));
+        Point2D p2 = resTr.apply(new Point2D(dx, dy));
+        double dxFr = p1.getX() - p2.getX();
+        double dyFr = p1.getY() - p2.getY();
+        // perform translate
+        setTransform(getTransform().translation(dxFr, dyFr));
     }
 
     /**
-     * set default scale of the image
+     * Set default scale of the image.
      */
     public void defaultScaleImage() {
-        complexFractalDrawer.setTransform(Point2DTransformer.CLEAR);
+        setTransform(Point2DTransformer.CLEAR);
     }
 
     /**
@@ -178,9 +320,8 @@ public class ComplexFractalCanvasDrawer {
      * @param y      y coordinate of the center scale at canvas
      */
     public void scaleImage(double xScale, double yScale, double x, double y) {
-        Point2DTransformer resTr = complexFractalDrawer.getResultingTransform();
-        Point2D center = resTr.apply(new Point2D(x, y));
-        complexFractalDrawer.setTransform(complexFractalDrawer.getTransform().scale(xScale, yScale, center));
+        Point2D center = getResultingTransform().apply(new Point2D(x, y));
+        setTransform(getTransform().scale(xScale, yScale, center));
     }
 
     /**
@@ -189,7 +330,103 @@ public class ComplexFractalCanvasDrawer {
      * @param angle angle of rotate
      */
     public void rotateImage(double angle) {
-        Point2D center = complexFractalDrawer.getCenterCorrdinate();
-        complexFractalDrawer.setTransform(complexFractalDrawer.getTransform().rotate(angle, center));
+        Point2D center = getResultingTransform().apply(new Point2D(getImageBufferWidth() / 2.0, getImageBufferHeigth() / 2.0));
+        setTransform(getTransform().rotate(angle, center));
+    }
+
+
+    /**
+     * Start drawing fractal with current settings.
+     * Drawing will interrupt if {@code changedProperty} is set to true.
+     */
+    private void drawFractal() {
+        // previous tread has ended because the setting is changed or
+        // thread drew the fractal changedProperty is set to true
+
+        // setting of the fractal
+        ComplexFractalChecker cFrCh;
+        IterativePalette itPl;
+        Point2DTransformer tr;
+        // current setting of the image
+        WritableImage im;
+
+        synchronized (this) {
+            // get current setting
+
+            // current setting of the fractal
+            cFrCh = getFractal();
+            itPl = getPalette();
+            tr = getTransform();
+            // current setting of the image
+            im = getImageBuffer();
+
+            // changes has accepted to processing
+            changedProperty.set(false);
+            complexFractalDrawer.setPermitWork(true);
+            // start work
+            workProperty.set(true);
+        }
+
+        // draw preview of the fractal
+        drawPreview(im, tr, cFrCh, itPl);
+
+        // draw fractal
+        drawFractalFull(im, tr, cFrCh, itPl);
+
+        // if thread draw fractal fully then working has been finished
+        if (!isImageChanged()) {
+            workProperty.set(false);
+        }
+    }
+
+
+    /**
+     * Draw preview of the fractal with current setting.
+     * If {@code changedProperty}  is set to true, than drawing is interrupted.
+     *
+     * @param im  current image
+     * @param tr  transform of the points
+     * @param fCh checker of the fractal
+     * @param pl  palette
+     */
+    private void drawPreview(WritableImage im, Point2DTransformer tr, ComplexFractalChecker fCh, IterativePalette pl) {
+        // size of the main image
+        int h = (int) im.getHeight();
+        int w = (int) im.getWidth();
+        // size of the preview image
+        int hPr = edgeImagePreview;
+        int wPr = edgeImagePreview;
+        if (h > w) {
+            hPr = (int) (hPr * ((double) h / (double) w));
+        } else {
+            wPr = (int) (wPr * ((double) w / (double) h));
+        }
+
+        // create the small preview image
+        WritableImage previewImage = new WritableImage(wPr, hPr);
+        ComplexFractalDrawer.drawFractal(previewImage, ImageUtils.calculateInitialTransform(wPr, hPr).addAfter(tr), fCh, pl);
+
+        // rescale image
+        synchronized (im) {
+            ImageUtils.bilinearInterpolation(previewImage, im);
+        }
+    }
+
+    /**
+     * Draw fractal completely.
+     * If {@code changedProperty}  is set to true, than drawing is interrupted.
+     *
+     * @param im  current image
+     * @param tr  transform of the point (with preTransform)
+     * @param fCh checker of the fractal
+     * @param pl  palette
+     */
+    private void drawFractalFull(WritableImage im, Point2DTransformer tr, ComplexFractalChecker fCh, IterativePalette pl) {
+        // size of the main image
+        int h = (int) im.getHeight();
+        int w = (int) im.getWidth();
+
+        complexFractalDrawer.setImage(im);
+        complexFractalDrawer.drawFractal(ImageUtils.calculateInitialTransform(w, h).addAfter(tr), fCh, pl);
     }
 }
