@@ -1,6 +1,5 @@
-package local.fractal;
+package local.fractal.frontend;
 
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.event.ActionEvent;
@@ -15,6 +14,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import local.fractal.model.MandelbrotSet;
+import local.fractal.util.ComplexFractalCanvasDrawer;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -25,10 +25,7 @@ import java.util.List;
  *
  * @author Kochin Konstantin Alexandrovich
  */
-public class MainWindowController {
-    // Main window
-    private Stage mainWindows;
-
+public class MainWindow {
     // Drawer of the fractal
     private ComplexFractalCanvasDrawer fd;
     // canvas for painting
@@ -38,7 +35,7 @@ public class MainWindowController {
     @FXML
     private Circle workIndicator;
 
-    // indicators of the choice
+    // toggles of the navigation modes
     @FXML
     private ToggleGroup zoomToggleGroup;
     @FXML
@@ -49,14 +46,16 @@ public class MainWindowController {
     private double yMouseCanvas;
 
     /**
-     * Load scene for the window and show it.
+     * Construct window of the program.
+     * This method construct and set {@code scene}, set window title and minimal size of the window,
+     * but doesn't show window.     *
      *
-     * @param stage stage for scene
+     * @param stage stage of the window
      * @return controller of this window
      */
-    public static MainWindowController createWindow(Stage stage) {
+    public static MainWindow createWindow(Stage stage) {
         // load the graph scene
-        FXMLLoader fxmlLoader = new FXMLLoader(MainWindowController.class.getResource("/frontend/MainWindow.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(MainWindow.class.getResource("MainWindow.fxml"));
         Parent root;
         try {
             root = fxmlLoader.load();
@@ -70,13 +69,8 @@ public class MainWindowController {
         // set minimal size of window
         stage.minWidthProperty().set(600);
         stage.minHeightProperty().set(400);
-        // get controller and initialize his field mainWindow
-        MainWindowController controller = fxmlLoader.getController();
-        controller.mainWindows = stage;
-        // show windows
-        stage.show();
 
-        return controller;
+        return fxmlLoader.getController();
     }
 
     /**
@@ -85,12 +79,13 @@ public class MainWindowController {
     public void initialize() {
         fd = new ComplexFractalCanvasDrawer(mainCanvas, new MandelbrotSet());
         // set indicator of the working
-        InvalidationListener updateWorkIndicator = (obs) -> Platform.runLater(() -> {
+        InvalidationListener updateWorkIndicator = (obs) -> {
             boolean status = ((ReadOnlyBooleanProperty) obs).get();
             List<String> styleClasses = workIndicator.getStyleClass();
-            styleClasses.clear();
+            styleClasses.remove("working");
+            styleClasses.remove("waiting");
             styleClasses.add(status ? "working" : "waiting");
-        });
+        };
         // bind indicator
         fd.workProperty().addListener(updateWorkIndicator);
         // set initial value of the indicator
@@ -102,33 +97,37 @@ public class MainWindowController {
      *
      * @return true if "zoom in" is chosen, false if "zoom out" is chosen
      */
-    private boolean isZoomInChoosed() {
-        final String zoomInStr = "Zoom in";
-        final String zoomOutStr = "Zoom out";
-        String rbText = ((RadioButton) zoomToggleGroup.getSelectedToggle()).getText();
-        if (rbText.equals(zoomInStr))
-            return true;
-        else if (rbText.equals(zoomOutStr))
-            return false;
-        else
-            throw new IllegalStateException("Unknown radio button.");
+    private boolean isZoomInChosen() {
+        final String zoomInId = "zoomInRadioButton";
+        final String zoomOutId = "zoomOutRadioButton";
+        String rbId = ((RadioButton) zoomToggleGroup.getSelectedToggle()).getId();
+        switch (rbId) {
+            case zoomInId:
+                return true;
+            case zoomOutId:
+                return false;
+            default:
+                throw new IllegalStateException("Unknown radio button.");
+        }
     }
 
     /**
      * Determine the shift/rotate option.
      *
-     * @return true if shift" is chosen, false if "rotate" is chosen
+     * @return true if "shift" is chosen, false if "rotate" is chosen
      */
-    private boolean isTranslateChoosed() {
-        final String shiftStr = "Shift image";
-        final String rotateStr = "Rotate image";
-        String rbText = ((RadioButton) rotateShiftToggleGroup.getSelectedToggle()).getText();
-        if (rbText.equals(shiftStr))
-            return true;
-        else if (rbText.equals(rotateStr))
-            return false;
-        else
-            throw new IllegalStateException("Unknown radio button.");
+    private boolean isTranslateChosen() {
+        final String shiftId = "shiftRadioButton";
+        final String rotateId = "rotateRadioButton";
+        String rbId = ((RadioButton) rotateShiftToggleGroup.getSelectedToggle()).getId();
+        switch (rbId) {
+            case shiftId:
+                return true;
+            case rotateId:
+                return false;
+            default:
+                throw new IllegalStateException("Unknown radio button.");
+        }
     }
 
     /**
@@ -137,8 +136,8 @@ public class MainWindowController {
      * @param event mouse event
      */
     public void canvasMouseDrag(MouseEvent event) {
-        if (isTranslateChoosed()) {
-            // shift the image
+        if (isTranslateChosen()) {
+            // shift image
             fd.translateImage(event.getX() - xMouseCanvas, event.getY() - yMouseCanvas);
         } else {
             // rotate image
@@ -159,13 +158,13 @@ public class MainWindowController {
             }
         }
 
-        // store the coordinate of the mouse on canvas
+        // store the coordinate of the mouse on the canvas
         xMouseCanvas = event.getX();
         yMouseCanvas = event.getY();
     }
 
     /**
-     * Start dragging mouse on canvas.
+     * Start dragging mouse on the canvas.
      *
      * @param event mouse event
      */
@@ -192,7 +191,7 @@ public class MainWindowController {
     public void canvasMouseClicked(MouseEvent event) {
         if (event.getClickCount() == 2) {
             // scale image
-            if (isZoomInChoosed())
+            if (isZoomInChosen())
                 fd.scaleImage(0.5, 0.5, event.getX(), event.getY());
             else
                 fd.scaleImage(2, 2, event.getX(), event.getY());
@@ -206,6 +205,7 @@ public class MainWindowController {
      */
     public void openSaveDialog(ActionEvent actionEvent) throws IOException {
         // show open save dialog
-        SaveDialogController.showDialog(mainWindows, fd);
+        //SaveDialog.showDialog(mainWindows, fd);
+        //((Node) actionEvent.getSource()).getScene().;
     }
 }

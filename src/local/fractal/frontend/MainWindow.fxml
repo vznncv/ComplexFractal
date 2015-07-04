@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
+<?import java.net.URL?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" prefHeight="600" prefWidth="800"
+            xmlns="http://javafx.com/javafx/8" fx:controller="local.fractal.frontend.MainWindow">
+    <stylesheets>
+        <URL value="@CommonStyles.css"/>
+        <URL value="@MainWindowStyle.css"/>
+    </stylesheets>
+
+
+    <!-- canvas for drawing the fractal -->
+    <center>
+        <Canvas fx:id="mainCanvas" height="${root.height-120}" width="${root.width-40}"
+                onMouseDragged="#canvasMouseDrag" onMousePressed="#canvasMousePressed"
+                onMouseClicked="#canvasMouseClicked"/>
+    </center>
+
+    <!-- control elements -->
+    <bottom>
+        <HBox fx:id="controlPanel" styleClass="borderControlPanel">
+
+            <!-- working indicator -->
+            <Circle fx:id="workIndicator" radius="10"/>
+
+            <Separator orientation="VERTICAL"/>
+
+            <!-- control of the zoom and position panel -->
+            <HBox fx:id="controlPositionPanel">
+
+                <!-- restore default setting -->
+                <Button fx:id="restoreDefaultButton" text="Default"
+                        GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.rowSpan="2"
+                        onAction="#canvasDefaultScale">
+                    <tooltip>
+                        <Tooltip text="Restore default zoom and position."/>
+                    </tooltip>
+                </Button>
+
+                <!-- control of the zoom -->
+                <VBox fx:id="controlZoomPane">
+                    <children>
+                        <fx:define>
+                            <ToggleGroup fx:id="zoomToggleGroup"/>
+                        </fx:define>
+                        <RadioButton fx:id="zoomInRadioButton" text="Zoom in" toggleGroup="$zoomToggleGroup"
+                                     selected="true">
+                            <tooltip>
+                                <Tooltip text="Zoom in into 2 times. Left-click on canvas to zoom in."/>
+                            </tooltip>
+                        </RadioButton>
+                        <RadioButton fx:id="zoomOutRadioButton" text="Zoom out" toggleGroup="$zoomToggleGroup">
+                            <tooltip>
+                                <Tooltip text="Zoom out into 2 times. Left-click on canvas to zoom out."/>
+                            </tooltip>
+                        </RadioButton>
+                    </children>
+                </VBox>
+
+                <!-- control of the rotate and shift -->
+                <VBox fx:id="controlRotateShiftPane">
+                    <fx:define>
+                        <ToggleGroup fx:id="rotateShiftToggleGroup"/>
+                    </fx:define>
+                    <RadioButton fx:id="shiftRadioButton" text="Shift image"
+                                 toggleGroup="$rotateShiftToggleGroup"
+                                 selected="true">
+                        <tooltip>
+                            <Tooltip text="Drag image for shift."/>
+                        </tooltip>
+                    </RadioButton>
+                    <RadioButton fx:id="rotateRadioButton" text="Rotate image"
+                                 toggleGroup="$rotateShiftToggleGroup">
+                        <tooltip>
+                            <Tooltip text="Drag image for rotate."/>
+                        </tooltip>
+                    </RadioButton>
+                </VBox>
+
+            </HBox>
+
+            <Separator orientation="VERTICAL"/>
+
+            <!-- fractal and palette settings -->
+            <VBox fx:id="fractalSettingsPanel">
+                <Button text="Choose fractal">
+                    <tooltip>
+                        <Tooltip text="Chose the type of the fractal"/>
+                    </tooltip>
+                </Button>
+                <Button text="Palette settings">
+                    <tooltip>
+                        <Tooltip text="Fractal color setting"/>
+                    </tooltip>
+                </Button>
+            </VBox>
+
+            <Separator orientation="VERTICAL"/>
+
+            <!-- save current image to the file -->
+            <Button text="Save" onAction="#openSaveDialog">
+                <tooltip>
+                    <Tooltip text="Save current view"/>
+                </tooltip>
+            </Button>
+
+        </HBox>
+    </bottom>
+
+</BorderPane>

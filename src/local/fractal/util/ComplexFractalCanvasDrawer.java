@@ -1,6 +1,7 @@
-package local.fractal;
+package local.fractal.util;
 
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
@@ -9,14 +10,14 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.image.WritableImage;
 import local.fractal.model.ComplexFractal;
 import local.fractal.model.ComplexFractalChecker;
-import local.fractal.util.*;
 
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * This class {@ComplexFractalCanvasDrawer} draws fractal in background thread on the canvas.
+ * This class {@code ComplexFractalCanvasDrawer} draws fractal in background thread on the canvas.
  *
  * @author Kochin Konstantin Alexandrovich
  */
@@ -63,13 +64,17 @@ public class ComplexFractalCanvasDrawer {
         return t;
     });
     /**
-     * It's indicator that fractal is drawing.
+     * It's indicator of the drawing of the fractal.
      */
-    private ReadOnlyBooleanWrapper workProperty = new ReadOnlyBooleanWrapper(false);
+    private ReadOnlyBooleanWrapper work = new ReadOnlyBooleanWrapper(false);
+    /**
+     * It's helper object for update work property in javaFX thread.
+     */
+    private AtomicReference<Boolean> updateWorkValue = new AtomicReference<>(null);
     /**
      * It's indicator that fractal is changed and image need to update.
      */
-    private BooleanProperty changedProperty = new SimpleBooleanProperty(false);
+    private BooleanProperty changed = new SimpleBooleanProperty(false);
 
 
     /**
@@ -94,8 +99,8 @@ public class ComplexFractalCanvasDrawer {
         this.canvas.heightProperty().addListener(e -> resizeImage());
         this.canvas.widthProperty().addListener(e -> resizeImage());
 
-        // when changedProperty is set to the true, start redrawing the image
-        changedProperty.addListener((obj, oldVal, newVal) -> {
+        // when changed is set to the true, start redrawing the image
+        changed.addListener((obj, oldVal, newVal) -> {
             if (newVal) {
                 // stop drawing in complexFractalDrawer
                 complexFractalDrawer.setPermitWork(false);
@@ -104,8 +109,8 @@ public class ComplexFractalCanvasDrawer {
             }
         });
         // start redrawing the fractal
-        changedProperty.set(false);
-        changedProperty.set(true);
+        changed.set(false);
+        changed.set(true);
 
 
         // covert maxFPS to time in the nanosecond between the frames
@@ -166,7 +171,7 @@ public class ComplexFractalCanvasDrawer {
      */
     public synchronized void setPalette(IterativePalette iterativePalette) {
         this.iterativePalette = Objects.requireNonNull(iterativePalette);
-        changedProperty.set(true);
+        changed.set(true);
     }
 
     /**
@@ -185,7 +190,7 @@ public class ComplexFractalCanvasDrawer {
      */
     public synchronized void setFractal(ComplexFractalChecker complexFractalChecker) {
         this.complexFractalChecker = Objects.requireNonNull(complexFractalChecker);
-        changedProperty.set(true);
+        changed.set(true);
     }
 
     /**
@@ -206,7 +211,7 @@ public class ComplexFractalCanvasDrawer {
         Objects.requireNonNull(transform);
         if (!this.transform.equals(transform)) {
             this.transform = transform;
-            changedProperty.set(true);
+            changed.set(true);
         }
     }
 
@@ -226,7 +231,7 @@ public class ComplexFractalCanvasDrawer {
      */
     private synchronized void setImageBuffer(WritableImage imageBuffer) {
         this.imageBuffer = Objects.requireNonNull(imageBuffer);
-        changedProperty.set(true);
+        changed.set(true);
     }
 
     /**
@@ -263,17 +268,35 @@ public class ComplexFractalCanvasDrawer {
      * @return {@code true} if image (fractal) is changed otherwise {@code false}
      */
     private synchronized boolean isImageChanged() {
-        return changedProperty.get();
+        return changed.get();
     }
 
 
+    /**
+     * Get status of the drawing.
+     *
+     * @return {@code true} if the fractal is drawing
+     */
+    final public boolean isWork() {
+        return work.get();
+    }
     /**
      * Get property indicated that fractal is drawing.
      *
      * @return property indicated calculating of the fractal
      */
     public ReadOnlyBooleanProperty workProperty() {
-        return workProperty.getReadOnlyProperty();
+        return work.getReadOnlyProperty();
+    }
+
+    /**
+     * This method can update work property in non javaFX thread.
+     *
+     * @param work value of the work property
+     */
+    private void updateWork(boolean work) {
+        if (updateWorkValue.getAndSet(work) == null)
+            Platform.runLater(() -> this.work.set(updateWorkValue.getAndSet(null)));
     }
 
 
@@ -337,11 +360,11 @@ public class ComplexFractalCanvasDrawer {
 
     /**
      * Start drawing fractal with current settings.
-     * Drawing will interrupt if {@code changedProperty} is set to true.
+     * Drawing will interrupt if {@code changed} is set to true.
      */
     private void drawFractal() {
         // previous tread has ended because the setting is changed or
-        // thread drew the fractal changedProperty is set to true
+        // thread drew the fractal changed is set to true
 
         // setting of the fractal
         ComplexFractalChecker cFrCh;
@@ -361,10 +384,10 @@ public class ComplexFractalCanvasDrawer {
             im = getImageBuffer();
 
             // changes has accepted to processing
-            changedProperty.set(false);
+            changed.set(false);
             complexFractalDrawer.setPermitWork(true);
             // start work
-            workProperty.set(true);
+            updateWork(true);
         }
 
         // draw preview of the fractal
@@ -375,14 +398,14 @@ public class ComplexFractalCanvasDrawer {
 
         // if thread draw fractal fully then working has been finished
         if (!isImageChanged()) {
-            workProperty.set(false);
+            updateWork(false);
         }
     }
 
 
     /**
      * Draw preview of the fractal with current setting.
-     * If {@code changedProperty}  is set to true, than drawing is interrupted.
+     * If {@code changed}  is set to true, than drawing is interrupted.
      *
      * @param im  current image
      * @param tr  transform of the points
@@ -414,7 +437,7 @@ public class ComplexFractalCanvasDrawer {
 
     /**
      * Draw fractal completely.
-     * If {@code changedProperty}  is set to true, than drawing is interrupted.
+     * If {@code changed}  is set to true, than drawing is interrupted.
      *
      * @param im  current image
      * @param tr  transform of the point (with preTransform)

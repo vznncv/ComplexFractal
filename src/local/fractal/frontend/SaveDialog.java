@@ -1,10 +1,11 @@
-package local.fractal;
+package local.fractal.frontend;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import local.fractal.util.ComplexFractalCanvasDrawer;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -14,7 +15,7 @@ import java.io.UncheckedIOException;
  *
  * @author Kochin Konstantin Alexandrovich
  */
-public class SaveDialogController {
+public class SaveDialog {
 
 
     /**
@@ -25,7 +26,7 @@ public class SaveDialogController {
      */
     public static void showDialog(Stage parentWindow, ComplexFractalCanvasDrawer fd) {
         // load the graph scene
-        FXMLLoader fxmlLoader = new FXMLLoader(SaveDialogController.class.getResource("/frontend/SaveDialog.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(SaveDialog.class.getResource("/frontend/SaveDialog.fxml"));
         Parent root;
         try {
             root = fxmlLoader.load();
@@ -43,7 +44,7 @@ public class SaveDialogController {
         window.minWidthProperty().set(400);
         window.minHeightProperty().set(200);
         // get controller
-        SaveDialogController controller = fxmlLoader.getController();
+        SaveDialog controller = fxmlLoader.getController();
         // set controller options
 
         // show windows

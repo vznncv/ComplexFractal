@@ -6,7 +6,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 
 /**
- * The class {@code ImageUtils} contain some helper static methods.
+ * The class {@code ImageUtils} contain some helper static methods for drawing.
  */
 public class ImageUtils {
     /**

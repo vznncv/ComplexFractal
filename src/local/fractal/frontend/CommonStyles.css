@@ -1,11 +1,10 @@
 /* common styles for all elements */
 * {
-    -fx-base: DARKCYAN;
-}
-/* font settings */
-.text {
+    -fx-color: DARKCYAN; /* see caspian.css */
     -fx-font-family: "Arial Narrow";
+    -fx-text-fill: white;
 }
+
 
 /* style of the root element */
 .root {
@@ -16,7 +15,7 @@
 
 /* styles for buttons */
 .button {
-    -fx-text-fill: white;
+
     -fx-font-weight: bold;
     -fx-background-color: linear-gradient(#61A2B1, #2A5058);
     -fx-effect: innershadow(three-pass-box, rgba(0, 0, 0, 1), 4, 0, 0, 2);
@@ -25,13 +24,8 @@
 .button:pressed {
     -fx-background-color: linear-gradient(#54818C, #172E32);
 }
-/* styles for labels */
-.label {
-    -fx-text-fill: white;
-}
 /* styles for radio-buttons */
 .radio-button {
-    -fx-text-fill: white;
     -fx-mark-highlight-color: DARKSLATEGREY;
 }
 /* common style for separators */
@@ -54,6 +48,6 @@
 
 /* unlimited size of the all buttons */
 .button {
-    -fx-max-height: 9999;
-    -fx-max-width: 9999;
+    -fx-max-height: infinity;
+    -fx-max-width: infinity;
 }

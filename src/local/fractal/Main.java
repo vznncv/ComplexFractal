@@ -1,8 +1,8 @@
-package frontend;
+package local.fractal;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import local.fractal.MainWindowController;
+import local.fractal.frontend.MainWindow;
 
 /**
  * This is main class of the program, which this program starts.
@@ -17,6 +17,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        MainWindowController.createWindow(primaryStage);
+        MainWindow.createWindow(primaryStage);
+        primaryStage.show();
     }
 }
