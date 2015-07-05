@@ -12,6 +12,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Circle;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import local.fractal.model.MandelbrotSet;
 import local.fractal.util.ComplexFractalCanvasDrawer;
@@ -26,6 +27,10 @@ import java.util.List;
  * @author Kochin Konstantin Alexandrovich
  */
 public class MainWindow {
+    // root node of the window
+    @FXML
+    private Parent root;
+
     // Drawer of the fractal
     private ComplexFractalCanvasDrawer fd;
     // canvas for painting
@@ -67,8 +72,8 @@ public class MainWindow {
         // set title of the window
         stage.setTitle("Fractals");
         // set minimal size of window
-        stage.minWidthProperty().set(600);
-        stage.minHeightProperty().set(400);
+        stage.setMinWidth(600);
+        stage.setMinHeight(400);
 
         return fxmlLoader.getController();
     }
@@ -204,8 +209,15 @@ public class MainWindow {
      * @param actionEvent button event
      */
     public void openSaveDialog(ActionEvent actionEvent) throws IOException {
-        // show open save dialog
-        //SaveDialog.showDialog(mainWindows, fd);
-        //((Node) actionEvent.getSource()).getScene().;
+        // create new stage
+        Stage saveDialogWindow = new Stage();
+        saveDialogWindow.initOwner(root.getScene().getWindow());
+        saveDialogWindow.initModality(Modality.WINDOW_MODAL);
+        // construct window
+        SaveDialog saveDialog = SaveDialog.createWindow(saveDialogWindow);
+
+
+        // show dialog
+        saveDialogWindow.showAndWait();
     }
 }

@@ -17,6 +17,32 @@ import java.io.UncheckedIOException;
  */
 public class SaveDialog {
 
+    /**
+     * Construct window of the save dialog.
+     *
+     * @param stage window of the save dialog
+     * @return controller of the window
+     */
+    public static SaveDialog createWindow(Stage stage) {
+        // load the graph scene
+        FXMLLoader fxmlLoader = new FXMLLoader(SaveDialog.class.getResource("SaveDialog.fxml"));
+        Parent root;
+        try {
+            root = fxmlLoader.load();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        // create and set scene
+        stage.setScene(new Scene(root));
+        // set title of the window
+        stage.setTitle("Save current fractal");
+        // set minimal size of the window
+        stage.setMinHeight(400);
+        stage.setMinHeight(300);
+
+        return fxmlLoader.getController();
+    }
+
 
     /**
      * This method showing save dialog for fractal image with blocking the {@code parentWindow}

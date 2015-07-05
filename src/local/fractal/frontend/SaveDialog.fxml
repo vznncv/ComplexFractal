@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import local.fractal.frontend.IntegerSpinnerValueFactoryWithoutExceptions?>
 <?import java.net.URL?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:id="root"
             prefHeight="200.0" prefWidth="400.0" fx:controller="local.fractal.frontend.SaveDialog">
@@ -38,5 +39,14 @@
                          GridPane.columnSpan="3"/>
         </GridPane>
     </center>
+
+    <bottom>
+        <Spinner>
+            <editable>true</editable>
+            <valueFactory>
+                <IntegerSpinnerValueFactoryWithoutExceptions min="1" max="10000"/>
+            </valueFactory>
+        </Spinner>
+    </bottom>
 
 </BorderPane>

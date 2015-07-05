@@ -24,6 +24,12 @@
 .button:pressed {
     -fx-background-color: linear-gradient(#54818C, #172E32);
 }
+/* styles for text fields */
+.text-field {
+    -fx-control-inner-background: derive(WHITE, -20%);
+    -fx-text-fill: derive(BLACK, 20%);
+}
+
 /* styles for radio-buttons */
 .radio-button {
     -fx-mark-highlight-color: DARKSLATEGREY;
