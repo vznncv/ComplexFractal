@@ -1,20 +1,39 @@
-/* style of the panel with buttons save and cancel */
+/* style of the save settings */
+#saveSettingPanel {
+    -fx-alignment: center;
+    -fx-spacing: 10px;
+    -fx-padding: 10px;
+}
+
+/* style of the file choosing */
+#chooseFilePanel > BorderPane {
+    -fx-padding: 0px 0px 0px 10px;
+}
+#chooseFilePanel > Button{
+    -fx-pref-height: 32px;
+}
+
+/* style of the width/height settings */
+#sizeSettingPanel TextField {
+    -fx-pref-width: 100px;
+}
+#sizeSettingPanel HBox {
+    -fx-alignment: center;
+    -fx-spacing: 5px;
+}
+
+/* style of the progress bar */
+#progress {
+    -fx-max-width: infinity;
+}
+
+/* style of the control buttons */
 #actionPanel {
     -fx-alignment: center;
     -fx-spacing: 10px;
+    -fx-padding: 5px;
 }
-
-/* setting of the GridPane */
-#grid {
-    -fx-hgap: 10px;
-    -fx-vgap: 10px;
-    -fx-max-width: 380px;
-    -fx-max-height: 160px;
-    -fx-pref-width: 380px;
-    -fx-pref-height: 160px;
-}
-
-/* setting of the progress bar */
-#progress {
-    -fx-pref-width: 380px;
+#actionPanel > Button{
+    -fx-pref-width: 100px;
+    -fx-pref-height: 32px;
 }

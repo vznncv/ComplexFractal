@@ -108,7 +108,7 @@ public class ComplexFractalCanvasDrawer {
                 singlePool.execute(this::drawFractal);
             }
         });
-        // start redrawing the fractal
+        // start redrawing the fractal (after invocation method setFractal, setPalette, resizeImage has true value)
         changed.set(false);
         changed.set(true);
 
