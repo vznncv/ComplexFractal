@@ -4,6 +4,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * This class provide utils for validation of the {@code TextField}.
@@ -11,10 +12,11 @@ import java.util.Objects;
 public class TextFormatterUtil {
 
     /**
-     * Add validators (using TextFormatter and onFocus event) for input integer number in the text field.
-     * @param textField text field
-     * @param min minimum value of the number
-     * @param max maximum value of the number
+     * Add validators (using TextFormatter, onFocus and onAction event) for input integer number in the text field.
+     *
+     * @param textField    text field
+     * @param min          minimum value of the number
+     * @param max          maximum value of the number
      * @param defaultValue default value of the number
      */
     public static void setIntegerRange(TextField textField, int min, int max, int defaultValue) {
@@ -44,43 +46,32 @@ public class TextFormatterUtil {
         }));
 
         // check value range
-        textField.focusedProperty().addListener((obs, oldValF, newValF) -> {
-            if (!newValF) {
-                if (textField.getText().isEmpty()) {
-                    // set default value
-                    textField.setText(String.valueOf(defaultValue));
-                }
-                // check current value
+        Function<String, String> checkText = (text) -> {
+            if (textField.getText().isEmpty()) {
+                // return default value
+                return String.valueOf(defaultValue);
+            }
+            // check current value
+            try {
                 int currentValue = Integer.valueOf(textField.getText());
                 if (currentValue < min)
-                    textField.setText(String.valueOf(min));
+                    return String.valueOf(min);
                 if (currentValue > max)
-                    textField.setText(String.valueOf(max));
+                    return String.valueOf(max);
+            } catch (NumberFormatException e) {
+                // return default value
+                return String.valueOf(defaultValue);
+            }
+            // return value without changing
+            return text;
+        };
+
+        // add validate listeners
+        textField.focusedProperty().addListener((obs, o, n) -> {
+            if (!n) {
+                textField.setText(checkText.apply(textField.getText()));
             }
         });
-
+        textField.setOnAction(e -> textField.setText(checkText.apply(textField.getText())));
     }
-
-
-    /*
-        extends TextFormatter<Integer> {
-    public IntegerTextFormatter(@NamedArg("min") int min, @NamedArg("max") int max, @NamedArg("initValue") int initValue) {
-        super(new IntegerStringConverter(),
-                initValue,
-                change -> {
-                    // pass empty string
-                    if (change.getControlNewText().isEmpty())
-                        return change;
-                    // if new value isn't integer, that reject changes
-                    try {
-                        Integer newVal = Integer.valueOf(change.getControlNewText());
-                        if (newVal > max)
-                            change.
-                        return change;
-                    } catch (NumberFormatException e) {
-                        return null;
-                    }
-                }
-        );
-    }*/
 }
