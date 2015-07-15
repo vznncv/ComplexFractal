@@ -215,7 +215,10 @@ public class MainWindow {
         saveDialogWindow.initModality(Modality.WINDOW_MODAL);
         // construct window
         SaveDialog saveDialog = SaveDialog.createWindow(saveDialogWindow);
-
+        // set current fractal parameters
+        saveDialog.setComplexFractalChecker(fd.getFractal());
+        saveDialog.setIterativePalette(fd.getPalette());
+        saveDialog.setTransform(fd.getTransform());
 
         // show dialog
         saveDialogWindow.showAndWait();

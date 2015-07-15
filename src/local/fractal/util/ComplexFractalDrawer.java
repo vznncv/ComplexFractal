@@ -167,6 +167,10 @@ public class ComplexFractalDrawer {
         }
         // draw has been ended
         setWork(false);
+        // reset progress if calculation has been canceled
+        if (!isPermitWork()) {
+            setProgress(0.0);
+        }
     }
 
 
@@ -239,7 +243,7 @@ public class ComplexFractalDrawer {
      *
      * @return {@code true} if it can otherwise {@code false}
      */
-    private boolean isPermitWork() {
+    public boolean isPermitWork() {
         return permitWork;
     }
 

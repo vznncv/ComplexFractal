@@ -23,8 +23,11 @@
 }
 
 /* style of the progress bar */
-#progress {
+#progressPanel ProgressBar {
     -fx-max-width: infinity;
+}
+#progressPanel ProgressIndicator .percentage {
+    -fx-fill: white;
 }
 
 /* style of the control buttons */

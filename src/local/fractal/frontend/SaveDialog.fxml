@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import java.net.URL?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:id="root"
-            prefHeight="200.0" prefWidth="400.0" fx:controller="local.fractal.frontend.SaveDialog">
+            prefHeight="200.0" prefWidth="600.0" fx:controller="local.fractal.frontend.SaveDialog">
     <stylesheets>
         <URL value="@CommonStyles.css"/>
         <URL value="@SaveDialogStyle.css"/>
@@ -44,14 +44,21 @@
                 </HBox>
 
             </GridPane>
-            <ProgressBar fx:id="progress"/>
+            <BorderPane fx:id="progressPanel">
+                <left>
+                    <ProgressIndicator progress="${progressBar.progress}" />
+                </left>
+                <center>
+                    <ProgressBar fx:id="progressBar"/>
+                </center>
+            </BorderPane>
         </VBox>
     </center>
 
     <bottom>
         <HBox fx:id="actionPanel">
-            <Button text="Save"/>
-            <Button text="Cancel"/>
+            <Button fx:id="saveButton" onAction="#save" text="Save"/>
+            <Button fx:id="cancelButton" onAction="#cancel" text="Cancel"/>
         </HBox>
     </bottom>
 
