@@ -1,0 +1,83 @@
+#allPaletteSettings {
+    -fx-padding: 10px;
+    -fx-spacing: 10px;
+}
+
+
+
+
+/* styles of the settings of the background colors of the fractal */
+#backgroundPaletteSettings {
+    -fx-hgap: 10px;
+    -fx-vgap: 10px;
+}
+#redPhi0Label, #greenPhi0Label, #bluePhi0Label {
+    -fx-pref-width: 40px;
+    -fx-alignment: center-right;
+}
+#redPhi0Slider, #greenPhi0Slider, #bluePhi0Slider {
+    -fx-rotate: 180;
+}
+#redPeriodLabel, #greenPeriodLabel, #bluePeriodLabel {
+    -fx-pref-width: 60px;
+    -fx-alignment: center-right;
+}
+#redLabel {
+    -fx-text-fill: RED;
+}
+#greenLabel {
+    -fx-text-fill: GREEN;
+}
+#blueLabel {
+    -fx-text-fill: BLUE;
+}
+#redLabel, #greenLabel, #blueLabel {
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, WHITE, 20, 0.6, 0, 0);
+}
+
+
+
+
+/* styles of the chart */
+#lineChart {
+    -fx-legend-visible: false;
+    -fx-create-symbols: false;
+}
+#lineChart .series0{
+    -fx-stroke: RED;
+    -fx-effect: dropshadow(gaussian, RED, 2px, 0.5, 0, 0);
+}
+#lineChart .series1 {
+    -fx-stroke: GREEN;
+    -fx-effect: dropshadow(gaussian, GREEN, 2px, 0.5, 0, 0);
+}
+#lineChart .series2{
+    -fx-stroke: BLUE;
+    -fx-effect: dropshadow(gaussian, BLUE, 2px, 0.5, 0, 0);
+}
+#lineChart .series0, #lineChart .series1, #lineChart .series2 {
+    -fx-stroke-width: 1px;
+}
+
+
+
+
+/* styles of the settings of the fractal color */
+#fractalColorSettings {
+    -fx-alignment: center;
+    -fx-spacing: 10px;
+}
+
+
+
+
+/* style of the control buttons */
+#actionPanel {
+    -fx-alignment: center;
+    -fx-spacing: 10px;
+}
+#actionPanel > Button{
+    -fx-pref-width: 100px;
+    -fx-pref-height: 32px;
+}

@@ -14,10 +14,7 @@ import javafx.scene.image.WritableImage;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import local.fractal.model.ComplexFractalChecker;
-import local.fractal.util.ComplexFractalDrawer;
-import local.fractal.util.ImageUtils;
-import local.fractal.util.IterativePalette;
-import local.fractal.util.Point2DTransformer;
+import local.fractal.util.*;
 
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -36,7 +33,7 @@ import java.util.function.Consumer;
  *
  * @author Kochin Konstantin Alexandrovich
  */
-public class SaveDialog {
+public class SaveDialog extends BaseDialog{
     // text field with file name for saving the fractal
     @FXML
     private TextField fileName;
@@ -81,8 +78,14 @@ public class SaveDialog {
         // set minimal size of the window
         stage.setMinWidth(400);
         stage.setMinHeight(200);
+        // save stage
+        SaveDialog controller = fxmlLoader.getController();
+        controller.setStage(stage);
 
-        return fxmlLoader.getController();
+        // cancel rendering if the window is hide
+        stage.setOnCloseRequest(event -> controller.fd.setPermitWork(false));
+
+        return controller;
     }
 
     /**
@@ -144,7 +147,8 @@ public class SaveDialog {
     /**
      * Initialize function, it will be invoked after the scene graph is loaded.
      */
-    public void initialize() {
+    @FXML
+    private void initialize() {
         // set validation of the width and height
         TextFormatterUtil.setIntegerRange(imageWidth, 100, 8000, 1600);
         TextFormatterUtil.setIntegerRange(imageHeight, 100, 4500, 900);
@@ -168,7 +172,6 @@ public class SaveDialog {
             if (updateProgress.getAndSet((Double) n) == null)
                 Platform.runLater(() -> progressBar.setProgress(updateProgress.getAndSet(null)));
         });
-
     }
 
 
@@ -222,12 +225,12 @@ public class SaveDialog {
         }
         // check that set file have ".png" extension
         if (!file.toString().endsWith(".png")) {
-            new Alert(Alert.AlertType.ERROR, "File must have \".png\" extension.").showAndWait();
+            new Alert(Alert.AlertType.ERROR, "The file must have \".png\" extension.").showAndWait();
             return;
         }
         // check that isn't directory
         if (Files.isDirectory(file)) {
-            new Alert(Alert.AlertType.ERROR, "Directory with same name \"" + file + "\" exists.").showAndWait();
+            new Alert(Alert.AlertType.ERROR, "The directory with same name \"" + file + "\" exists.").showAndWait();
             return;
         }
         // check that file is available for writing if it exists
@@ -277,10 +280,8 @@ public class SaveDialog {
             fd.setPermitWork(false);
         } else {
             // close window
-            Stage stage = (Stage) saveButton.getScene().getWindow();
-            stage.close();
+            closeWindow();
         }
 
     }
-
 }

@@ -10,19 +10,22 @@
 .root {
     -fx-background-image: url("background.png");
     -fx-padding: 5px;
+    /* some helper properties for button */
+    -fr-button-non-pressed:  linear-gradient(#61A2B1, #2A5058);
+    -fr-button-pressed: linear-gradient(#54818C, #172E32);
+    -fr-button-effect: innershadow(three-pass-box, rgba(0, 0, 0, 1), 4, 0, 0, 0);
 }
 
 
 /* styles for buttons */
 .button {
-
     -fx-font-weight: bold;
-    -fx-background-color: linear-gradient(#61A2B1, #2A5058);
-    -fx-effect: innershadow(three-pass-box, rgba(0, 0, 0, 1), 4, 0, 0, 2);
+    -fx-background-color: -fr-button-non-pressed;
+    -fx-effect: -fr-button-effect;
     -fx-background-radius: 10px;
 }
 .button:pressed {
-    -fx-background-color: linear-gradient(#54818C, #172E32);
+    -fx-background-color: -fr-button-pressed;
 }
 /* styles for text fields */
 .text-field {
@@ -56,4 +59,38 @@
 .button {
     -fx-max-height: infinity;
     -fx-max-width: infinity;
+}
+
+
+/* styles for color picker */
+.color-picker {
+    -fx-font-weight: bold;
+    -fx-background-color: -fr-button-non-pressed;
+    -fx-effect: -fr-button-effect;
+    -fx-background-radius: 10px;
+}
+.color-picker:pressed {
+    -fx-background-color: -fr-button-pressed;
+}
+.color-palette {
+    -fx-background-image: url("background.png");
+}
+.custom-color-dialog .controls-pane .left-pill,
+.custom-color-dialog .controls-pane .center-pill,
+.custom-color-dialog .controls-pane .right-pill {
+    -fx-font-weight: bold;
+    -fx-background-color: -fr-button-non-pressed;
+    -fx-effect: -fr-button-effect;
+}
+.custom-color-dialog .controls-pane .left-pill:pressed,
+.custom-color-dialog .controls-pane .center-pill:pressed,
+.custom-color-dialog .controls-pane .right-pill:pressed {
+    -fx-background-color: -fr-button-pressed;
+}
+.custom-color-dialog .controls-pane .customcolor-controls-background
+{
+    -fx-background-color:  rgba(40%, 40%, 40%, 0.3);
+}
+.custom-color-dialog .controls-pane #buttons-hbox {
+    -fx-alignment:center;
 }

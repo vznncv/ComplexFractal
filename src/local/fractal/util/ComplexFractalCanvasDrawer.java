@@ -151,7 +151,7 @@ public class ComplexFractalCanvasDrawer {
      * @param fractal complex fractal for drawing
      */
     public ComplexFractalCanvasDrawer(Canvas canvas, ComplexFractal fractal) {
-        this(canvas, fractal, new IterativePaletteV1());
+        this(canvas, fractal, new IterativePaletteSin());
     }
 
 
@@ -170,8 +170,11 @@ public class ComplexFractalCanvasDrawer {
      * @param iterativePalette palette
      */
     public synchronized void setPalette(IterativePalette iterativePalette) {
-        this.iterativePalette = Objects.requireNonNull(iterativePalette);
-        changed.set(true);
+        Objects.requireNonNull(iterativePalette);
+        if (this.iterativePalette == null || !this.iterativePalette.equals(iterativePalette)) {
+            this.iterativePalette = iterativePalette;
+            changed.set(true);
+        }
     }
 
     /**
@@ -189,8 +192,11 @@ public class ComplexFractalCanvasDrawer {
      * @param complexFractalChecker complex fractal checker.
      */
     public synchronized void setFractal(ComplexFractalChecker complexFractalChecker) {
-        this.complexFractalChecker = Objects.requireNonNull(complexFractalChecker);
-        changed.set(true);
+        Objects.requireNonNull(complexFractalChecker);
+        if (this.complexFractalChecker == null || !this.complexFractalChecker.equals(complexFractalChecker)) {
+            this.complexFractalChecker = complexFractalChecker;
+            changed.set(true);
+        }
     }
 
     /**
@@ -209,7 +215,7 @@ public class ComplexFractalCanvasDrawer {
      */
     public synchronized void setTransform(Point2DTransformer transform) {
         Objects.requireNonNull(transform);
-        if (!this.transform.equals(transform)) {
+        if (this.transform == null || !this.transform.equals(transform)) {
             this.transform = transform;
             changed.set(true);
         }
@@ -280,6 +286,7 @@ public class ComplexFractalCanvasDrawer {
     final public boolean isWork() {
         return work.get();
     }
+
     /**
      * Get property indicated that fractal is drawing.
      *

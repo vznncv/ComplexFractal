@@ -8,14 +8,17 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Alert;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Circle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import local.fractal.model.ComplexFractal;
 import local.fractal.model.MandelbrotSet;
 import local.fractal.util.ComplexFractalCanvasDrawer;
+import local.fractal.util.IterativePaletteSin;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -27,10 +30,12 @@ import java.util.List;
  * @author Kochin Konstantin Alexandrovich
  */
 public class MainWindow {
+    // helper dialogs
+    SinPaletteChoiceDialog sinPaletteChoiceDialog;
+    SaveDialog saveDialog;
     // root node of the window
     @FXML
     private Parent root;
-
     // Drawer of the fractal
     private ComplexFractalCanvasDrawer fd;
     // canvas for painting
@@ -140,7 +145,8 @@ public class MainWindow {
      *
      * @param event mouse event
      */
-    public void canvasMouseDrag(MouseEvent event) {
+    @FXML
+    private void canvasMouseDrag(MouseEvent event) {
         if (isTranslateChosen()) {
             // shift image
             fd.translateImage(event.getX() - xMouseCanvas, event.getY() - yMouseCanvas);
@@ -173,7 +179,8 @@ public class MainWindow {
      *
      * @param event mouse event
      */
-    public void canvasMousePressed(MouseEvent event) {
+    @FXML
+    private void canvasMousePressed(MouseEvent event) {
         // store the coordinate of the mouse on canvas
         xMouseCanvas = event.getX();
         yMouseCanvas = event.getY();
@@ -184,7 +191,8 @@ public class MainWindow {
      *
      * @param actionEvent button event
      */
-    public void canvasDefaultScale(ActionEvent actionEvent) {
+    @FXML
+    private void canvasDefaultScale(ActionEvent actionEvent) {
         fd.defaultScaleImage();
     }
 
@@ -193,8 +201,9 @@ public class MainWindow {
      *
      * @param event mouse event
      */
-    public void canvasMouseClicked(MouseEvent event) {
-        if (event.getClickCount() == 2) {
+    @FXML
+    private void canvasMouseClicked(MouseEvent event) {
+        if (event.getClickCount() >= 2) {
             // scale image
             if (isZoomInChosen())
                 fd.scaleImage(0.5, 0.5, event.getX(), event.getY());
@@ -205,22 +214,70 @@ public class MainWindow {
 
     /**
      * Open save dialog
-     *
-     * @param actionEvent button event
      */
-    public void openSaveDialog(ActionEvent actionEvent) throws IOException {
-        // create new stage
-        Stage saveDialogWindow = new Stage();
-        saveDialogWindow.initOwner(root.getScene().getWindow());
-        saveDialogWindow.initModality(Modality.WINDOW_MODAL);
-        // construct window
-        SaveDialog saveDialog = SaveDialog.createWindow(saveDialogWindow);
+    @FXML
+    private void openSaveDialog() throws IOException {
+        // create new dialog window if this is required
+        if (saveDialog == null ) {
+            // create new stage
+            Stage saveDialogWindow = new Stage();
+            saveDialogWindow.initOwner(root.getScene().getWindow());
+            saveDialogWindow.initModality(Modality.WINDOW_MODAL);
+            // construct window
+            saveDialog = SaveDialog.createWindow(saveDialogWindow);
+        }
         // set current fractal parameters
         saveDialog.setComplexFractalChecker(fd.getFractal());
         saveDialog.setIterativePalette(fd.getPalette());
         saveDialog.setTransform(fd.getTransform());
 
         // show dialog
-        saveDialogWindow.showAndWait();
+        saveDialog.showAndWait();
+    }
+
+    /**
+     * Open choosing palette dialog.
+     */
+    @FXML
+    private void openSinPaletteChoiceDioalog() {
+        // get and check palette
+        if (!(fd.getPalette() instanceof IterativePaletteSin)) {
+            new Alert(Alert.AlertType.ERROR, "It cannot modify that palette type.");
+            return;
+        }
+        IterativePaletteSin palette = (IterativePaletteSin) fd.getPalette();
+
+        // get limit iterations of the ComplexFractalChecker
+        if (!(fd.getFractal() instanceof ComplexFractal)) {
+            new Alert(Alert.AlertType.ERROR, "It cannot modify that palette type with that type of the fractal.");
+            return;
+        }
+        ComplexFractal fractalChecker = (ComplexFractal) fd.getFractal();
+
+        // create new dialog window if this is required
+        if (sinPaletteChoiceDialog == null || sinPaletteChoiceDialog.getMaxIter() != fractalChecker.getMaxIter()) {
+            // create new stage
+            Stage paletteDialogWindow = new Stage();
+            paletteDialogWindow.initOwner(root.getScene().getWindow());
+            paletteDialogWindow.initModality(Modality.WINDOW_MODAL);
+            // construct window
+            sinPaletteChoiceDialog = SinPaletteChoiceDialog.createWindow(paletteDialogWindow, palette, fractalChecker.getMaxIter());
+        }
+
+        // show dialog
+        sinPaletteChoiceDialog.showAndWait();
+
+        // save new palette
+        fd.setPalette(sinPaletteChoiceDialog.getPalette());
+    }
+
+
+    /**
+     * Open choosing fractal dialog.
+     */
+    @FXML
+    private void openComplexFractalDialog() {
+        // stub
+        new Alert(Alert.AlertType.ERROR, "Dialog isn't available yet.").showAndWait();
     }
 }

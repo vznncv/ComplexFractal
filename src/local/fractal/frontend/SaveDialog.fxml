@@ -56,7 +56,7 @@
     </center>
 
     <bottom>
-        <HBox fx:id="actionPanel">
+        <HBox fx:id="actionPanel" styleClass="borderControlPanel">
             <Button fx:id="saveButton" onAction="#save" text="Save"/>
             <Button fx:id="cancelButton" onAction="#cancel" text="Cancel"/>
         </HBox>
