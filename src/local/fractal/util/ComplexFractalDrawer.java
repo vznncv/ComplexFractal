@@ -10,20 +10,25 @@ import javafx.scene.paint.Color;
 import local.fractal.model.ComplexFractalChecker;
 
 import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.stream.IntStream;
 
 /**
- * The class {@code ComplexFractalDrawer} renders fractal on the {@code WritableImage}.
+ * The class {@code ComplexFractalDrawer} draws fractal on the {@code WritableImage}.
  */
 public class ComplexFractalDrawer {
     /**
-     * Indicator of the drawing.
+     * Defines static of drawing (true if the fractal is being drawing, otherwise false).
      */
     private final ReadOnlyBooleanWrapper work = new ReadOnlyBooleanWrapper(false);
     /**
-     * Indicator of the completing of the drawing (from 0 to 1).
+     * Defines status of completing of the drawing (from 0 to 1).
      */
     private final ReadOnlyDoubleWrapper progress = new ReadOnlyDoubleWrapper(0.0);
+
+    /**
+     * Number row of the image which has been drawn (this number is great or equal zero).
+     */
+    private volatile int numberDrawnRows = 0;
     /**
      * Image for drawing. When pixels are being drawn on image, the image is blocked.
      */
@@ -33,7 +38,6 @@ public class ComplexFractalDrawer {
      */
     private volatile boolean permitWork;
 
-
     /**
      * Default constructor.
      */
@@ -41,12 +45,11 @@ public class ComplexFractalDrawer {
         setPermitWork(true);
     }
 
-
     /**
-     * Calculate line of the point of the fractal for drawing.
+     * Calculates the row of the point of fractal image.
      *
-     * @param numLine   y coordinate of the line
-     * @param lineWidth width of the line
+     * @param numLine   y coordinate of the row
+     * @param lineWidth width of the row
      * @param resTr     transform matrix for the point
      * @param fCh       checker of the fractal
      * @param pl        palette
@@ -58,15 +61,13 @@ public class ComplexFractalDrawer {
         if (lineWidth <= 0)
             throw new IllegalArgumentException("lineWidth <= 0");
 
-        return Stream
+        return IntStream
                 // generate line of the points from (numLine, 0) to (numLine, lineWidth - 1)
-                .iterate(new Point2D(0, numLine), (p) -> new Point2D(p.getX() + 1, p.getY())).limit(lineWidth)
-                        // create the parallel stream for increase of the performance
-                .parallel()
+                .range(0, lineWidth).parallel().mapToObj(colNum -> new Point2D(colNum, numLine))
                         // perform affine transform of the points
                 .map(resTr::apply)
                         // calculate number of the iteration for points
-                .mapToInt((c) -> fCh.numberIter(c.toComplex()))
+                .mapToInt(fCh::numberIter)
                         // map number of the iteration to color
                 .mapToObj(pl::numIterToColor)
                         // get result as array
@@ -74,8 +75,7 @@ public class ComplexFractalDrawer {
     }
 
     /**
-     * Draw the fractal on image.
-     * This method will return control after it draws the fractal.
+     * Draws the fractal on image.
      *
      * @param image image
      * @param resTr transform matrix for the points of the image
@@ -89,7 +89,7 @@ public class ComplexFractalDrawer {
 
         // draw the fractal
         PixelWriter pw = image.getPixelWriter();
-        for (int i = 1; i < h; i++) {
+        for (int i = 0; i < h; i++) {
             // calculate the line of the fractal
             Color[] colors = calculateLine(i, w, resTr, fCh, pl);
             // draw line
@@ -97,13 +97,46 @@ public class ComplexFractalDrawer {
                 pw.setColor(j, i, colors[j]);
             }
         }
+    }
 
+
+    public final double getProgress() {
+        synchronized (progress) {
+            return progress.get();
+        }
+    }
+
+    private void setProgress(double progress) {
+        if (progress < 0.0 || progress > 1.0)
+            throw new IllegalArgumentException("Illegal progress value");
+        synchronized (this.progress) {
+            this.progress.set(progress);
+        }
+    }
+
+    public ReadOnlyDoubleProperty progressProperty() {
+        return progress.getReadOnlyProperty();
+    }
+
+    public final boolean isWork() {
+        synchronized (work) {
+            return work.get();
+        }
+    }
+
+    private void setWork(boolean work) {
+        synchronized (this.work) {
+            this.work.set(work);
+        }
+    }
+
+    public ReadOnlyBooleanProperty workProperty() {
+        return work.getReadOnlyProperty();
     }
 
 
     /**
-     * Get current image.
-     * When pixels are being drawn on image, the image is blocked with {@code synchronized}.
+     * Gets current image. When pixels are being drawn on image, the image is blocked with {@code synchronized}.
      *
      * @return image
      */
@@ -112,7 +145,7 @@ public class ComplexFractalDrawer {
     }
 
     /**
-     * Set image for drawing.
+     * Sets image for drawing.
      *
      * @param image image for drawing
      */
@@ -121,8 +154,35 @@ public class ComplexFractalDrawer {
     }
 
     /**
-     * Draw the fractal.
-     * If image will be set new image when fractal is drawing then method continues to draw on the old image.
+     * This object can drawing the fractal?
+     *
+     * @return {@code true} if it can otherwise {@code false}
+     */
+    public boolean isPermitWork() {
+        return permitWork;
+    }
+
+    /**
+     * Forbid/allow work.
+     *
+     * @param permitWork {@code true} if work allow, otherwise {@code false}
+     */
+    public void setPermitWork(boolean permitWork) {
+        this.permitWork = permitWork;
+    }
+
+    /**
+     * Gets number rows that has been drawn.
+     *
+     * @return number of the rows.
+     */
+    public int getNumberDrawnRows() {
+        return numberDrawnRows;
+    }
+
+    /**
+     * Draws the fractal. If image will be set new image when fractal is drawing then method continues to draw on the
+     * old image. It's possible to get status of drawing image in the other thread.
      *
      * @param resTr transform matrix for the points of the image
      * @param fCh   checker of the fractal
@@ -137,6 +197,7 @@ public class ComplexFractalDrawer {
         // prepare for new drawing
         setProgress(0.0);
         setWork(true);
+        numberDrawnRows = 0;
         WritableImage currentImage = image;
 
         // size of the image
@@ -164,6 +225,7 @@ public class ComplexFractalDrawer {
             i++;
             // update the progress
             setProgress((double) i / (double) h);
+            numberDrawnRows++;
         }
         // draw has been ended
         setWork(false);
@@ -171,88 +233,5 @@ public class ComplexFractalDrawer {
         if (!isPermitWork()) {
             setProgress(0.0);
         }
-    }
-
-
-    /**
-     * Get progress of the drawing the of fractal.
-     *
-     * @return status (from 0.0 to 1.0)
-     */
-    public final double getProgress() {
-        synchronized (progress) {
-            return progress.get();
-        }
-    }
-
-    /**
-     * Set progress of the drawing of the fractal.
-     *
-     * @param progress status (from 0.0 to 1.0)
-     */
-    private void setProgress(double progress) {
-        if (progress < 0.0 || progress > 1.0)
-            throw new IllegalArgumentException("Illegal progress value");
-        synchronized (this.work) {
-            this.progress.set(progress);
-        }
-    }
-
-    /**
-     * Get progress property. This property has range [0, 1], and show part of completed work.
-     *
-     * @return progress property
-     */
-    public ReadOnlyDoubleProperty progressProperty() {
-        return progress.getReadOnlyProperty();
-    }
-
-    /**
-     * Drawing is being.
-     *
-     * @return {@code true} if fractal is being drawn otherwise {@code false}
-     */
-    public final boolean isWork() {
-        synchronized (work) {
-            return work.get();
-        }
-    }
-
-    /**
-     * Set status of the work.
-     *
-     * @param work this value must be {@code true} if fractal is being drawn, otherwise {@code false}
-     */
-    private void setWork(boolean work) {
-        synchronized (this.work) {
-            this.work.set(work);
-        }
-    }
-
-    /**
-     * Get work property.
-     *
-     * @return work property
-     */
-    public ReadOnlyBooleanProperty workProperty() {
-        return work.getReadOnlyProperty();
-    }
-
-    /**
-     * This object can drawing the fractal?
-     *
-     * @return {@code true} if it can otherwise {@code false}
-     */
-    public boolean isPermitWork() {
-        return permitWork;
-    }
-
-    /**
-     * Forbid/allow work.
-     *
-     * @param permitWork {@code true} if work allow, otherwise {@code false}
-     */
-    public void setPermitWork(boolean permitWork) {
-        this.permitWork = permitWork;
     }
 }

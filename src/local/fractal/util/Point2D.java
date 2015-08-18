@@ -1,9 +1,7 @@
 package local.fractal.util;
 
-import org.apache.commons.math3.complex.Complex;
-
 /**
- * A {@code Point2D} represent the 2D point.
+ * A {@code Point2D} represents the 2D point.
  *
  * @author Kochin Konstantin Alexandrovich
  */
@@ -18,7 +16,7 @@ final public class Point2D {
     private double y;
 
     /**
-     * Construct point (0,0).
+     * Create the point with coordinate (0,0).
      */
     public Point2D() {
         setX(0);
@@ -26,7 +24,7 @@ final public class Point2D {
     }
 
     /**
-     * Construct point.
+     * Create the point.
      *
      * @param x x coordinate
      * @param y y coordinate
@@ -41,7 +39,7 @@ final public class Point2D {
      *
      * @return x coordinate
      */
-    public final double getX() {
+    public double getX() {
         return x;
     }
 
@@ -50,7 +48,7 @@ final public class Point2D {
      *
      * @param x coordinate
      */
-    public final void setX(double x) {
+    public void setX(double x) {
         this.x = x;
     }
 
@@ -59,7 +57,7 @@ final public class Point2D {
      *
      * @return y coordinate
      */
-    public final double getY() {
+    public double getY() {
         return y;
     }
 
@@ -68,17 +66,8 @@ final public class Point2D {
      *
      * @param y coordinate
      */
-    public final void setY(double y) {
+    public void setY(double y) {
         this.y = y;
-    }
-
-    /**
-     * Return representation point as complex number.
-     *
-     * @return complex number
-     */
-    public final Complex toComplex() {
-        return new Complex(getX(), getY());
     }
 
     /**

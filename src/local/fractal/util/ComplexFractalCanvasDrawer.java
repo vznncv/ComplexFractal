@@ -29,7 +29,7 @@ public class ComplexFractalCanvasDrawer {
     /**
      * It's minimal size of the height and width of preview image of the fractal
      */
-    private final int edgeImagePreview = 40;
+    private final int edgeImagePreview = 80;
     /**
      * It's helper object for drawing the fractal to the buffer.
      */
@@ -43,6 +43,7 @@ public class ComplexFractalCanvasDrawer {
      * Buffer image with fractal.
      */
     private WritableImage imageBuffer;
+
     /**
      * Current affine transform of the complex plane.
      */
@@ -131,8 +132,11 @@ public class ComplexFractalCanvasDrawer {
                     // draw the fractal
                     if (!fractalIsComplete || isWork) {
                         WritableImage im = getImageBuffer();
+                        double h = complexFractalDrawer.getNumberDrawnRows();
+                        double w = im.getWidth();
+
                         synchronized (im) {
-                            canvas.getGraphicsContext2D().drawImage(im, 0, 0);
+                            canvas.getGraphicsContext2D().drawImage(im, 0, 0, w, h, 0, 0, w, h);
                         }
                     }
                     fractalIsComplete = !isWork;
@@ -341,8 +345,7 @@ public class ComplexFractalCanvasDrawer {
     }
 
     /**
-     * Change the scale of the image.
-     * The point with coordinate (x, y) doesn't move.
+     * Change the scale of the image. The point with coordinate (x, y) doesn't move.
      *
      * @param xScale x scales
      * @param yScale y scales
@@ -366,8 +369,7 @@ public class ComplexFractalCanvasDrawer {
 
 
     /**
-     * Start drawing fractal with current settings.
-     * Drawing will interrupt if {@code changed} is set to true.
+     * Start drawing fractal with current settings. Drawing will interrupt if {@code changed} is set to true.
      */
     private void drawFractal() {
         // previous tread has ended because the setting is changed or
@@ -411,8 +413,8 @@ public class ComplexFractalCanvasDrawer {
 
 
     /**
-     * Draw preview of the fractal with current setting.
-     * If {@code changed}  is set to true, than drawing is interrupted.
+     * Draw preview of the fractal with current setting. If {@code changed}  is set to true, than drawing is
+     * interrupted.
      *
      * @param im  current image
      * @param tr  transform of the points
@@ -436,15 +438,20 @@ public class ComplexFractalCanvasDrawer {
         WritableImage previewImage = new WritableImage(wPr, hPr);
         ComplexFractalDrawer.drawFractal(previewImage, ImageUtils.calculateInitialTransform(wPr, hPr).addAfter(tr), fCh, pl);
 
+        canvas.getGraphicsContext2D().drawImage(previewImage, 0, 0, w, h);
+
+        //System.out.println("After canvas");
+
+        /*
         // rescale image
         synchronized (im) {
-            ImageUtils.bilinearInterpolation(previewImage, im);
-        }
+            cachingBilinearInterpolation.interpolate(previewImage, im);
+            //ImageUtils.bilinearInterpolation(previewImage, im);
+        }*/
     }
 
     /**
-     * Draw fractal completely.
-     * If {@code changed}  is set to true, than drawing is interrupted.
+     * Draw fractal completely. If {@code changed}  is set to true, than drawing is interrupted.
      *
      * @param im  current image
      * @param tr  transform of the point (with preTransform)

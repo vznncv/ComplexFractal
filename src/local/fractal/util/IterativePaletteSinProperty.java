@@ -10,7 +10,7 @@ import javafx.scene.paint.Color;
 import java.util.function.DoubleFunction;
 
 /**
- * It's analogue of the class {@IterativePaletteSin}, but mutable and with property.
+ * It's analogue of the class {@code IterativePaletteSin}, but mutable and with property.
  */
 public class IterativePaletteSinProperty implements Observable {
 

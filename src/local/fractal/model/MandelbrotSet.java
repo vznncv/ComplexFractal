@@ -1,10 +1,11 @@
 package local.fractal.model;
 
+import local.fractal.util.Point2D;
 
-import org.apache.commons.math3.complex.Complex;
+import java.util.Objects;
 
 /**
- * A {@code MandelbrotSet} class checks belonging of point to Mandelbrot set.
+ * A {@code MandelbrotSet} class checks belonging of a point to Mandelbrot set.
  *
  * @author Kochin Konstantin Alexandrovich
  */
@@ -12,7 +13,8 @@ public class MandelbrotSet extends ComplexFractal {
 
 
     /**
-     * Default constructor. It set maximum number of the iterations to 1024 and radius of the bound to 2;
+     * Default constructor. It sets maximum number of the iterations in {@code 1024} and radius of the bound in {@code
+     * 2}.
      */
     public MandelbrotSet() {
         setMaxIter(1024);
@@ -20,28 +22,26 @@ public class MandelbrotSet extends ComplexFractal {
     }
 
     /**
-     * Check that point belongs Mandelbrot set. If it's true then return 0, else number of iteration when point cross
-     * bound {@literal (|z| >= rBound)}.
-     *
-     * @param z complex number
-     * @return 0 if it's fractal point or number of the iteration
+     * {@inheritDoc}
      */
     @Override
-    public int numberIter(Complex z) {
-        Complex zIter = Complex.ZERO;
+    public int numberIter(Point2D p) {
+        Objects.requireNonNull(p, "p is null");
+
         int maxIter = getMaxIter();
         int iter = 0;
-        double r = getCriticalR();
+        double r2 = getCriticalR() * getCriticalR();
+        ComplexNumber startP = new ComplexNumber(p.getX(), p.getY());
+        ComplexNumber currentP = new ComplexNumber(0.0, 0.0);
 
         // test point
-        while (iter < maxIter && zIter.abs() < r) {
-            zIter = zIter.multiply(zIter).add(z);
+        while (iter < maxIter && currentP.squareAbs() < r2) {
+            currentP.mulAndAsg(currentP).addAndAsg(startP);
             iter++;
         }
-        if (zIter.abs() < r) {
+        if (currentP.squareAbs() < r2) {
             iter = 0;
         }
-
         return iter;
     }
 }

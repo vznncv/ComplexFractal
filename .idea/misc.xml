@@ -15,7 +15,7 @@
     <option name="OPTION_DOCUMENT_TAG_VERSION" value="false" />
     <option name="OPTION_DOCUMENT_TAG_DEPRECATED" value="true" />
     <option name="OPTION_DEPRECATED_LIST" value="true" />
-    <option name="OTHER_OPTIONS" />
+    <option name="OTHER_OPTIONS" value="-link &quot;http://docs.oracle.com/javase/8/docs/api/&quot; -link &quot;https://docs.oracle.com/javase/8/javafx/api/&quot; -javafx" />
     <option name="HEAP_SIZE" />
     <option name="LOCALE" />
     <option name="OPEN_IN_BROWSER" value="true" />
