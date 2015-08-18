@@ -317,7 +317,7 @@ public class ComplexFractalCanvasDrawer {
      * @return resulting transformer
      */
     private Point2DTransformer getResultingTransform() {
-        return ImageUtils.calculateInitialTransform(getImageBufferWidth(), getImageBufferHeigth()).addAfter(getTransform());
+        return ComplexFractalDrawer.calculateInitialTransform(getImageBufferWidth(), getImageBufferHeigth()).addAfter(getTransform());
     }
 
 
@@ -436,7 +436,7 @@ public class ComplexFractalCanvasDrawer {
 
         // create the small preview image
         WritableImage previewImage = new WritableImage(wPr, hPr);
-        ComplexFractalDrawer.drawFractal(previewImage, ImageUtils.calculateInitialTransform(wPr, hPr).addAfter(tr), fCh, pl);
+        ComplexFractalDrawer.drawFractal(previewImage, ComplexFractalDrawer.calculateInitialTransform(wPr, hPr).addAfter(tr), fCh, pl);
 
         canvas.getGraphicsContext2D().drawImage(previewImage, 0, 0, w, h);
 
@@ -464,6 +464,6 @@ public class ComplexFractalCanvasDrawer {
         int w = (int) im.getWidth();
 
         complexFractalDrawer.setImage(im);
-        complexFractalDrawer.drawFractal(ImageUtils.calculateInitialTransform(w, h).addAfter(tr), fCh, pl);
+        complexFractalDrawer.drawFractal(ComplexFractalDrawer.calculateInitialTransform(w, h).addAfter(tr), fCh, pl);
     }
 }

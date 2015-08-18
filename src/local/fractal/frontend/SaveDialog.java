@@ -14,7 +14,10 @@ import javafx.scene.image.WritableImage;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import local.fractal.model.ComplexFractalChecker;
-import local.fractal.util.*;
+import local.fractal.util.BaseDialog;
+import local.fractal.util.ComplexFractalDrawer;
+import local.fractal.util.IterativePalette;
+import local.fractal.util.Point2DTransformer;
 
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -252,7 +255,7 @@ public class SaveDialog extends BaseDialog{
         fd.setPermitWork(true);
         new Thread(() -> {
             // start drawing
-            fd.drawFractal(ImageUtils.calculateInitialTransform(width, height).addAfter(getTransform()),
+            fd.drawFractal(ComplexFractalDrawer.calculateInitialTransform(width, height).addAfter(getTransform()),
                     getComplexFractalChecker(), getIterativePalette());
 
             // if fractal has been drawn, than try to save it
