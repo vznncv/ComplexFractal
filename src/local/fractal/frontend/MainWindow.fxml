@@ -32,7 +32,7 @@
             <!-- control of the zoom and position panel -->
             <HBox fx:id="controlPositionPanel">
 
-                <!-- restore default setting -->
+                <!-- restoring default setting -->
                 <Button fx:id="restoreDefaultButton" text="Default"
                         GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.rowSpan="2"
                         onAction="#canvasDefaultScale">

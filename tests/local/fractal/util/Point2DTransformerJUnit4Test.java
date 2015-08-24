@@ -6,7 +6,7 @@ import org.junit.Test;
 import java.lang.reflect.Method;
 
 /**
- * It's units test for class {@code Point2DTransformer}
+ * The {@code Point2DTransformerJUnit4Test} represents units test for class {@code Point2DTransformer}.
  */
 public class Point2DTransformerJUnit4Test {
 
@@ -22,6 +22,13 @@ public class Point2DTransformerJUnit4Test {
         return Math.pow(p1.getX() - p2.getX(), 2) + Math.pow(p1.getY() - p2.getY(), 2) < exactness * exactness;
     }
 
+    /**
+     * Compare coordinate of two points with exactness 0.001.
+     *
+     * @param p1 first point
+     * @param p2 second point
+     * @return true if coordinate of the points equal with exactness 0.001, otherwise false
+     */
     private static boolean pointEq(Point2D p1, Point2D p2) {
         return pointEq(p1, p2, 0.001);
     }

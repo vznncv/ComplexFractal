@@ -116,8 +116,7 @@
             <!-- This pane is used as wrapper for the canvas with minWidth="0" -->
             <BorderPane minWidth="0">
                 <center>
-                    <Canvas BorderPane.alignment="CENTER_RIGHT" fx:id="canvasPalette" height="40"
-                            width="${lineChart.width}"/>
+                    <Canvas BorderPane.alignment="CENTER_RIGHT" fx:id="canvasPalette" width="${lineChart.width}" height="40"/>
                 </center>
             </BorderPane>
 
@@ -135,7 +134,7 @@
     <bottom>
         <HBox fx:id="actionPanel" styleClass="borderControlPanel">
             <Button text="apply" onAction="#savePaletteChanges"/>
-            <Button text="default" onAction="#defalutPalette"/>
+            <Button text="default" onAction="#defaultPalette"/>
             <Button text="cancel" onAction="#cancelPaletteChanges"/>
         </HBox>
     </bottom>

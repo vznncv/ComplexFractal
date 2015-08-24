@@ -5,7 +5,7 @@ import javafx.stage.Stage;
 import local.fractal.frontend.MainWindow;
 
 /**
- * This is main class of the program, which this program starts.
+ * This is main class of the program which this program starts.
  *
  * @author Kochin Konstantin Alexandrovich
  */

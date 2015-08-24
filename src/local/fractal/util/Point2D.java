@@ -16,7 +16,7 @@ final public class Point2D {
     private double y;
 
     /**
-     * Create the point with coordinate (0,0).
+     * Creates the point with coordinate (0,0).
      */
     public Point2D() {
         setX(0);
@@ -35,7 +35,7 @@ final public class Point2D {
     }
 
     /**
-     * Get x coordinate.
+     * Gets x coordinate.
      *
      * @return x coordinate
      */
@@ -44,7 +44,7 @@ final public class Point2D {
     }
 
     /**
-     * set x coordinate
+     * Sets x coordinate.
      *
      * @param x coordinate
      */
@@ -53,7 +53,7 @@ final public class Point2D {
     }
 
     /**
-     * Get y coordinate.
+     * Gets y coordinate.
      *
      * @return y coordinate
      */
@@ -62,7 +62,7 @@ final public class Point2D {
     }
 
     /**
-     * Set y coordinate.
+     * Sets y coordinate.
      *
      * @param y coordinate
      */
@@ -71,7 +71,7 @@ final public class Point2D {
     }
 
     /**
-     * Return string representation of the {@code Point2D}.
+     * Returns string representation of the {@code Point2D}.
      *
      * @return string representation
      */
@@ -79,5 +79,4 @@ final public class Point2D {
     public String toString() {
         return "(" + getX() + ", " + getY() + ")";
     }
-
 }

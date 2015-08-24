@@ -7,22 +7,16 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.paint.Color;
 
-import java.util.function.DoubleFunction;
+import java.util.Objects;
 
 /**
- * It's analogue of the class {@code IterativePaletteSin}, but mutable and with property.
+ * The {@code IterativePaletteSinPropertyVersion} is helper class for creating {@link IterativePaletteSin}.
+ * <p>
+ * This class provides parameters of the {@code IterativePaletteSin} as JavaFX properties for binding for GUI elements.
+ *
+ * @author Kochin Konstantin Alexandrovich
  */
-public class IterativePaletteSinProperty implements Observable {
-
-    // phase corrector
-    private static DoubleFunction<Double> phaseCorrector = (val) -> {
-        val = val % (2 * Math.PI);
-        if (val < Math.PI)
-            val += 2 * Math.PI;
-        if (val > Math.PI)
-            val -= 2 * Math.PI;
-        return val;
-    };
+public class IterativePaletteSinPropertyVersion implements Observable {
 
     /**
      * Period of the red color.
@@ -61,11 +55,38 @@ public class IterativePaletteSinProperty implements Observable {
      */
     private SimpleDoubleProperty phi0B = new SimpleDoubleProperty();
     /**
-     * Define color of the fractal.
+     * Defines color of the fractal.
      *
      * @defaultValue Color.BLACK
      */
     private SimpleObjectProperty<Color> fractalColor = new SimpleObjectProperty<>(Color.BLACK);
+    /**
+     * Default constructor.
+     */
+    public IterativePaletteSinPropertyVersion() {
+    }
+    /**
+     * Constructor.
+     * @param palette palette for getting starting settings.
+     */
+    public IterativePaletteSinPropertyVersion(IterativePaletteSin palette) {
+        setPaletteSettings(palette);
+    }
+
+    /**
+     * Converts phase to range [-PI/2; PI/2].
+     *
+     * @param phase phase in unlimited rang
+     * @return phase in range [-PI/2; PI/2]
+     */
+    private static double correctPhase(double phase) {
+        phase = phase % (2 * Math.PI);
+        if (phase < Math.PI)
+            phase += 2 * Math.PI;
+        if (phase > Math.PI)
+            phase -= 2 * Math.PI;
+        return phase;
+    }
 
     public final double getPerR() {
         return perR.get();
@@ -152,23 +173,23 @@ public class IterativePaletteSinProperty implements Observable {
     }
 
     /**
-     * Apply setting of the {@code IterativePaletteSin}.
+     * Applies setting from the {@code IterativePaletteSin}.
      *
      * @param pl palette
      */
     public void setPaletteSettings(IterativePaletteSin pl) {
-        // it's desirable that initial phases limit from -PI/2 to PI/2
         setPerR(pl.getPerR());
         setPerG(pl.getPerG());
         setPerB(pl.getPerB());
-        setPhi0R(phaseCorrector.apply(pl.getPhi0R()));
-        setPhi0G(phaseCorrector.apply(pl.getPhi0G()));
-        setPhi0B(phaseCorrector.apply(pl.getPhi0B()));
+        // it's desirable that initial phases are limited with the range from -PI/2 to PI/2
+        setPhi0R(correctPhase(pl.getPhi0R()));
+        setPhi0G(correctPhase(pl.getPhi0G()));
+        setPhi0B(correctPhase(pl.getPhi0B()));
         setFractalColor(pl.getFractalColor());
     }
 
     /**
-     * Create immutable palette with current settings.
+     * Creates {@code IterativePaletteSin} using current settings.
      *
      * @return palette
      */
@@ -178,11 +199,14 @@ public class IterativePaletteSinProperty implements Observable {
 
 
     /**
-     * Adds a InvalidationListener which will be notified whenever the value of any properties of this object becomes invalid.
+     * Adds a InvalidationListener which will be notified whenever the value of any properties of this object becomes
+     * invalid.
      *
      * @param listener listener
+     * @throws NullPointerException if listener is null
      */
     public void addListener(InvalidationListener listener) {
+        Objects.requireNonNull(listener);
         InvalidationListener commonListener = obs -> listener.invalidated(this);
         perRProperty().addListener(commonListener);
         perGProperty().addListener(commonListener);
@@ -194,12 +218,14 @@ public class IterativePaletteSinProperty implements Observable {
     }
 
     /**
-     * Remove invalidation listener
+     * Removes invalidation listener.
      *
      * @param listener listener
+     * @throws NullPointerException if listener is null
      */
     @Override
     public void removeListener(InvalidationListener listener) {
+        Objects.requireNonNull(listener);
         perRProperty().removeListener(listener);
         perGProperty().removeListener(listener);
         perBProperty().removeListener(listener);
@@ -208,6 +234,4 @@ public class IterativePaletteSinProperty implements Observable {
         phi0BProperty().removeListener(listener);
         fractalColorProperty().removeListener(listener);
     }
-
-
 }

@@ -5,6 +5,7 @@
     -fx-padding: 10px;
 }
 
+
 /* style of the file choosing */
 #chooseFilePanel > BorderPane {
     -fx-padding: 0px 0px 0px 10px;
@@ -12,6 +13,7 @@
 #chooseFilePanel > Button{
     -fx-pref-height: 32px;
 }
+
 
 /* style of the width/height settings */
 #sizeSettingPanel TextField {
@@ -22,6 +24,7 @@
     -fx-spacing: 5px;
 }
 
+
 /* style of the progress bar */
 #progressPanel ProgressBar {
     -fx-max-width: infinity;
@@ -29,6 +32,7 @@
 #progressPanel ProgressIndicator .percentage {
     -fx-fill: white;
 }
+
 
 /* style of the control buttons */
 #actionPanel {

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:id="root"
+            prefHeight="400.0" prefWidth="600.0" fx:controller="local.fractal.frontend.ChooseComplexFractalDialog">
+    <stylesheets>
+        <URL value="@CommonStyles.css"/>
+        <URL value="@ChooseComplexFractalDialog.css"/>
+    </stylesheets>
+
+    <top>
+        <GridPane fx:id="baseSettingsPanel" styleClass="borderControlPanel">
+            <columnConstraints>
+                <ColumnConstraints minWidth="232" halignment="RIGHT"/>
+                <ColumnConstraints hgrow="ALWAYS"/>
+            </columnConstraints>
+
+            <Label GridPane.rowIndex="0" GridPane.columnIndex="0" text="Maximum number of the iterations"/>
+            <TextField fx:id="complexFractalParamMaxIter" GridPane.rowIndex="0" GridPane.columnIndex="1" text="1024"/>
+            <Label GridPane.rowIndex="1" GridPane.columnIndex="0" text="Radius of the bound"/>
+            <TextField fx:id="complexFractalParamCriticalR" GridPane.rowIndex="1" GridPane.columnIndex="1" text="2.0"/>
+        </GridPane>
+    </top>
+
+    <center>
+        <BorderPane fx:id="settingsPanel">
+            <top>
+                <ChoiceBox fx:id="choiceFractal" BorderPane.alignment="CENTER_LEFT"/>
+            </top>
+            <center>
+                <fx:define>
+                    <!-- Mandelbrot set settings -->
+                    <BorderPane fx:id="mandelbrotSetSettings">
+                        <top>
+                            <Label text="Description of the Mandelbrot set"/>
+                        </top>
+                        <center>
+                            <Label text="none"/>
+                        </center>
+                    </BorderPane>
+
+                    <!-- Julia set settings -->
+                    <BorderPane fx:id="juliaSetSettings">
+                        <top>
+                            <Label text="Description of the Julia set"/>
+                        </top>
+                        <center>
+                            <GridPane fx:id="juliaSetParamPane">
+                                <columnConstraints>
+                                    <ColumnConstraints minWidth="232" halignment="RIGHT"/>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                </columnConstraints>
+
+                                <Label GridPane.rowIndex="0" GridPane.columnIndex="0" text="c1"/>
+                                <TextField fx:id="juliaSetParamC1" GridPane.rowIndex="0" GridPane.columnIndex="1"  text="some param"/>
+                                <Label GridPane.rowIndex="1" GridPane.columnIndex="0" text="c2"/>
+                                <TextField fx:id="juliaSetParamC2" GridPane.rowIndex="1" GridPane.columnIndex="1" text="some param"/>
+                            </GridPane>
+                        </center>
+                    </BorderPane>
+
+                    <!-- Complex fractals version 1 settings -->
+                    <BorderPane fx:id="complexFractalV1Settings">
+                        <top>
+                            <Label text="Description of the complex fractal version 1"/>
+                        </top>
+                        <center>
+                            <GridPane fx:id="complexFractalV1ParamPane">
+                                <columnConstraints>
+                                    <ColumnConstraints minWidth="232" halignment="RIGHT"/>
+                                    <ColumnConstraints hgrow="ALWAYS"/>
+                                </columnConstraints>
+
+                                <Label GridPane.rowIndex="0" GridPane.columnIndex="0" text="n1"/>
+                                <TextField fx:id="complexFractalVersion1ParamN1" GridPane.rowIndex="0" GridPane.columnIndex="1"  text="some param"/>
+                                <Label GridPane.rowIndex="1" GridPane.columnIndex="0" text="n2"/>
+                                <TextField fx:id="complexFractalVersion1ParamN2" GridPane.rowIndex="1" GridPane.columnIndex="1" text="some param"/>
+                            </GridPane>
+                        </center>
+                    </BorderPane>
+
+                </fx:define>
+            </center>
+        </BorderPane>
+    </center>
+
+    <!-- buttons for applying/canceling changes -->
+    <bottom>
+        <HBox fx:id="actionPanel" styleClass="saveComplexFractal">
+            <Button text="apply" onAction="#saveComplexFractal"/>
+            <Button text="default" onAction="#defaultFractals"/>
+            <Button text="cancel" onAction="#notSaveComplexFractal"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

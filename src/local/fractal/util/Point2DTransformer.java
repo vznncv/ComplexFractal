@@ -5,14 +5,14 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * {@code Point2DTransformer} is class for 2-D affine transforms for the objects of class {@link Point2D}.
- * Objects of this class is immutable.
+ * A {@code Point2DTransformer} is class for 2D affine transforms for the objects of class {@link Point2D}.
+ * Objects of this class are immutable.
  *
  * @author Kochin Konstantin Alexandrovich
  */
 final public class Point2DTransformer {
     /**
-     * {@code Point2DTransformer} with identity matrix
+     * A {@code Point2DTransformer} with identity matrix (don't change the point).
      */
     public final static Point2DTransformer CLEAR = new Point2DTransformer(new double[]{
             1, 0, 0,
@@ -27,31 +27,36 @@ final public class Point2DTransformer {
 
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param trMartix transform matrix
+     * @throws NullPointerException     if trMartix is null
+     * @throws IllegalArgumentException if trMartix.length doesn't equal 9
      */
     private Point2DTransformer(double[] trMartix) {
         Objects.requireNonNull(trMartix);
         if (trMartix.length != 9)
-            new IllegalArgumentException("trMartix isn't matrix 3 by 3");
+            throw new IllegalArgumentException("trMartix isn't matrix 3 by 3");
         this.trMatrix = trMartix;
     }
 
     /**
-     * Calculate the matrix multiplication {@code res} = {@code l} * {code r}.
+     * Calculates the matrix multiplication.
+     * <p>
+     * {@code res} = {@code l} * {code r}
      *
      * @param l left argument
      * @param r right argument
      * @return result of the multiplication
+     * @throws NullPointerException if l or r is null
      */
     private static double[] matrixMul(double[] l, double[] r) {
         Objects.requireNonNull(l);
         Objects.requireNonNull(r);
         if (l.length != 9)
-            new IllegalArgumentException("l isn't matrix 3 by 3");
+            throw new IllegalArgumentException("l isn't matrix 3 by 3");
         if (r.length != 9)
-            new IllegalArgumentException("r isn't matrix 3 by 3");
+            throw new IllegalArgumentException("r isn't matrix 3 by 3");
 
         // calculate result of the matrix multiplication
         double[] res = new double[9];
@@ -66,12 +71,15 @@ final public class Point2DTransformer {
     }
 
     /**
-     * Apply current transform to the {@code point} and return its.
+     * Applies current transform to the {@code point} and return new point.
      *
      * @param point point for transformation
-     * @return point after transformation
+     * @return result of the point transformation
+     * @throws NullPointerException if point is null
      */
     public Point2D apply(Point2D point) {
+        Objects.requireNonNull(point);
+
         double[] oldP = {point.getX(), point.getY(), 1};
         double[] newP = new double[3];
 
@@ -86,11 +94,11 @@ final public class Point2DTransformer {
     }
 
     /**
-     * Translation transformation.
+     * Adds translation transformation.
      *
      * @param xShift x shift
      * @param yShift y shift
-     * @return transformer after transformation
+     * @return new Point2DTransformer with adding transformation
      */
     public Point2DTransformer translation(double xShift, double yShift) {
         double[] translationMat = {
@@ -102,25 +110,28 @@ final public class Point2DTransformer {
     }
 
     /**
-     * Scaling transformation.
+     * Adds scaling transformation.
      *
      * @param xScale x scaling
      * @param yScale y scaling
-     * @return transformer after transformation
+     * @return new Point2DTransformer with adding transformation
      */
     public Point2DTransformer scale(double xScale, double yScale) {
         return scale(xScale, yScale, new Point2D(0, 0));
     }
 
     /**
-     * Scaling transformation.
+     * Adds Scaling transformation.
      *
      * @param xScale x scaling
      * @param yScale y scaling
      * @param fixP   point which mustn't move after scale transform
-     * @return transformer after transformation
+     * @return new Point2DTransformer with adding transformation
+     * @throws NullPointerException if fixP is null
      */
     public Point2DTransformer scale(double xScale, double yScale, Point2D fixP) {
+        Objects.requireNonNull(fixP);
+
         double[] scaleMat = {
                 xScale, 0, fixP.getX() * (1 - xScale),
                 0, yScale, fixP.getY() * (1 - yScale),
@@ -130,23 +141,26 @@ final public class Point2DTransformer {
     }
 
     /**
-     * Rotation transformation.
+     * Adds rotation transformation.
      *
      * @param angle angle of the rotation
-     * @return transformer after transformation
+     * @return new Point2DTransformer with adding transformation
      */
     public Point2DTransformer rotate(double angle) {
         return rotate(angle, new Point2D(0, 0));
     }
 
     /**
-     * Rotation transformation.
+     * Adds rotation transformation.
      *
      * @param angle angle of the rotation
      * @param fixP  center of the rotate
-     * @return transformer after transformation
+     * @return new Point2DTransformer with adding transformation
+     * @throws NullPointerException if fixP is null
      */
     public Point2DTransformer rotate(double angle, Point2D fixP) {
+        Objects.requireNonNull(fixP);
+
         double cA = Math.cos(angle);
         double sA = Math.sin(angle);
         double xF = fixP.getX();
@@ -160,10 +174,11 @@ final public class Point2DTransformer {
     }
 
     /**
-     * Add transform {@code after} after this transform.
+     * Adds transform {@code after} after this transform.
      *
      * @param after adding transform
      * @return resulting transform
+     * @throws NullPointerException if after is null
      */
     public Point2DTransformer addAfter(Point2DTransformer after) {
         Objects.requireNonNull(after);
@@ -171,7 +186,7 @@ final public class Point2DTransformer {
     }
 
     /**
-     * Get transformer with identity matrix
+     * Gets transformer with identity matrix
      *
      * @return {@code Point2DTransformer} with identity matrix
      */
@@ -180,7 +195,7 @@ final public class Point2DTransformer {
     }
 
     /**
-     * Return string representation of the {@code Point2DTransformer}.
+     * Returns string representation of the {@code Point2DTransformer}.
      *
      * @return string representation
      */
@@ -200,16 +215,13 @@ final public class Point2DTransformer {
     }
 
     /**
-     * Compare transformers.
+     * Compares transformers.
      *
      * @param obj the reference object with which to compare
-     * @return {@code true} if transformers are same; {@code false} otherwise.
+     * @return true if transformers are same, otherwise false
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Point2DTransformer) {
-            return Arrays.equals(trMatrix, ((Point2DTransformer) obj).trMatrix);
-        }
-        return false;
+        return obj instanceof Point2DTransformer && Arrays.equals(trMatrix, ((Point2DTransformer) obj).trMatrix);
     }
 }

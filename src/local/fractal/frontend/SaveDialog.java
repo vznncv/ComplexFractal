@@ -32,11 +32,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 /**
- * It's controller of the window of the save dialog.
+ * The {@code SaveDialog} represents controller of the window of the save dialog.
  *
  * @author Kochin Konstantin Alexandrovich
  */
-public class SaveDialog extends BaseDialog{
+public class SaveDialog extends BaseDialog {
     // text field with file name for saving the fractal
     @FXML
     private TextField fileName;
@@ -60,7 +60,7 @@ public class SaveDialog extends BaseDialog{
     private ComplexFractalDrawer fd = new ComplexFractalDrawer();
 
     /**
-     * Construct window of the save dialog.
+     * Constructs window of the save dialog.
      *
      * @param stage window of the save dialog
      * @return controller of the window
@@ -92,7 +92,7 @@ public class SaveDialog extends BaseDialog{
     }
 
     /**
-     * Get current affine transform.
+     * Gets current affine transform.
      *
      * @return affine transform
      */
@@ -101,9 +101,8 @@ public class SaveDialog extends BaseDialog{
     }
 
     /**
-     * Set current
-     * Initial source of coordinate is in the center and image accommodate the square with coordinates of the corners:
-     * (1, 1), (1, -1), (-1, -1), (-1, 1).
+     * Sets affine transform.
+     * This transform applies after transform getting from {@link local.fractal.util.ComplexFractalDrawer#calculateInitialTransform}.
      *
      * @param transform new affine transform
      */
@@ -112,25 +111,25 @@ public class SaveDialog extends BaseDialog{
     }
 
     /**
-     * Get initiative palette of the fractal
+     * Gets palette of the fractal
      *
-     * @return initiative palette
+     * @return palette
      */
     public IterativePalette getIterativePalette() {
         return iterativePalette;
     }
 
     /**
-     * Set initiative palette of the fractal.
+     * Sets palette of the fractal.
      *
-     * @param iterativePalette initiative palette
+     * @param iterativePalette palette
      */
     public void setIterativePalette(IterativePalette iterativePalette) {
         this.iterativePalette = iterativePalette;
     }
 
     /**
-     * Get checker of the fractal.
+     * Gets checker of the fractal.
      *
      * @return checker of the fractal
      */
@@ -139,7 +138,7 @@ public class SaveDialog extends BaseDialog{
     }
 
     /**
-     * Set checker of the fractal.
+     * Sets checker of the fractal.
      *
      * @param complexFractalChecker checker of the fractal
      */
@@ -154,7 +153,7 @@ public class SaveDialog extends BaseDialog{
     private void initialize() {
         // set validation of the width and height
         TextFormatterUtil.setIntegerRange(imageWidth, 100, 8000, 1600);
-        TextFormatterUtil.setIntegerRange(imageHeight, 100, 4500, 900);
+        TextFormatterUtil.setIntegerRange(imageHeight, 100, 6000, 900);
         // set auto resolver for absolute path for fileName
         Consumer<Object> pathResolver = obj -> {
             try {
@@ -179,7 +178,7 @@ public class SaveDialog extends BaseDialog{
 
 
     /**
-     * Choose file for saving the image of the fractal.
+     * Chooses file for saving the image of the fractal.
      */
     @FXML
     private void chooseFile() {
@@ -197,8 +196,8 @@ public class SaveDialog extends BaseDialog{
 
 
     /**
-     * Render and save the fractal.
-     * Notice: error message may be show uncorrected (they cut too long text inside them)
+     * Draws and saves the fractal.
+     * Notice: error message may be show uncorrected (they cut too long text inside them).
      */
     @FXML
     private void save() {
@@ -274,7 +273,7 @@ public class SaveDialog extends BaseDialog{
     }
 
     /**
-     * Cancel current calculation or close window if calculation doesn't perform.
+     * Cancels current calculation or close window if calculation isn't performing.
      */
     @FXML
     private void cancel() {
@@ -285,6 +284,5 @@ public class SaveDialog extends BaseDialog{
             // close window
             closeWindow();
         }
-
     }
 }

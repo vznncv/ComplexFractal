@@ -7,11 +7,14 @@ import javafx.stage.Stage;
 import java.util.Objects;
 
 /**
- * It's helper superclass for controller of additional windows.
+ * The {@code BaseDialog} helper superclass for controller of additional windows. This class provides the property for
+ * {@code Stage} and methods for showing and closing (hiding) the window.
+ *
+ * @author Kochin Konstantin Alexandrovich
  */
 public class BaseDialog {
     /**
-     * State of the window.
+     * Defines stage of the window.
      *
      * @defaultValue null
      */
@@ -44,7 +47,7 @@ public class BaseDialog {
     }
 
     /**
-     * Hide the window.
+     * Hides the window.
      */
     protected void closeWindow() {
         getStage().close();

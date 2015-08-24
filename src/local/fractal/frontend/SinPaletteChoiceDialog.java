@@ -1,8 +1,12 @@
 package local.fractal.frontend;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -23,19 +27,22 @@ import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
 import javafx.util.converter.NumberStringConverter;
 import local.fractal.util.BaseDialog;
+import local.fractal.util.IterativePalette;
 import local.fractal.util.IterativePaletteSin;
-import local.fractal.util.IterativePaletteSinProperty;
+import local.fractal.util.IterativePaletteSinPropertyVersion;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.text.DecimalFormat;
 import java.util.Objects;
-import java.util.function.IntToDoubleFunction;
-import java.util.stream.Collectors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 /**
- * It's controller of the window of the palette  dialog.
+ * The {@code SinPaletteChoiceDialog} represents controller of the window for to change settings of the palette.
  *
  * @author Kochin Konstantin Alexandrovich
  */
@@ -46,16 +53,33 @@ public class SinPaletteChoiceDialog extends BaseDialog {
     // canvas for display palette
     @FXML
     private Canvas canvasPalette;
+    // Helper object for corrected canvasPalette updates
+    // (GraphicsContext size changes later than Canvas size)
+    private ExecutorService singlePool = Executors.newSingleThreadExecutor((task) -> {
+        Thread t = new Thread(task);
+        t.setDaemon(true);
+        return t;
+    });
+    private AtomicBoolean dataIsUpated = new AtomicBoolean(true);
+    private int msDelay = 100;
     // chart
     @FXML
     private LineChart<Number, Number> lineChart;
     // current palette for storing the changes
-    private IterativePaletteSinProperty currentPalette = new IterativePaletteSinProperty();
-    // final palette
+    private IterativePaletteSinPropertyVersion currentPalette = new IterativePaletteSinPropertyVersion(getDefaultPalette());
+    // resulting palette
     private IterativePaletteSin palette;
-    // limit of the iterations
-    private int maxIter;
-
+    /**
+     * Defines maximum number of the iterations of the FractalChecker.
+     *
+     * @defaultValue 1024
+     */
+    private IntegerProperty maxIter = new SimpleIntegerProperty(1024);
+    /**
+     * Defines maximal value of the period of the colors.
+     * It binds to {@code maxIter} by default.
+     */
+    private IntegerProperty maxColorPeriod = new SimpleIntegerProperty();
     // setting of the colors
     // red color
     @FXML
@@ -85,34 +109,26 @@ public class SinPaletteChoiceDialog extends BaseDialog {
     @FXML
     private Label bluePeriodLabel;
 
+    {
+        maxColorPeriod.bind(maxIter);
+    }
 
     /**
      * Constructor.
-     *
-     * @param palette palette for initial displaying
      */
-    private SinPaletteChoiceDialog(IterativePaletteSin palette, int maxIter) {
-        setPalette(palette);
-        setMaxIter(maxIter);
+    private SinPaletteChoiceDialog() {
     }
 
     /**
      * Construct window for choosing palette.
      *
-     * @param stage               window of the choosing palette dialog
-     * @param iterativePaletteSin palette for initial displaying
-     * @param maxIter             limit iterations of the ComplexFractalChecker
+     * @param stage window of the choosing palette dialog
      * @return controller of the window
      */
-    public static SinPaletteChoiceDialog createWindow(Stage stage, IterativePaletteSin iterativePaletteSin, int maxIter) {
+    public static SinPaletteChoiceDialog createWindow(Stage stage) {
         // load the graph scene
         FXMLLoader fxmlLoader = new FXMLLoader(SinPaletteChoiceDialog.class.getResource("SinPaletteChoiceDialog.fxml"));
-        fxmlLoader.setControllerFactory(c -> {
-            if (c != SinPaletteChoiceDialog.class) {
-                throw new IllegalArgumentException("It's wrong controller class (" + c + ") for the choosing palette dialog.");
-            }
-            return new SinPaletteChoiceDialog(iterativePaletteSin, maxIter);
-        });
+        fxmlLoader.setControllerFactory(obj -> new SinPaletteChoiceDialog());
         Parent root;
         try {
             root = fxmlLoader.load();
@@ -129,7 +145,7 @@ public class SinPaletteChoiceDialog extends BaseDialog {
         stage.setTitle("Choice of the palette");
         // set minimal size of the window
         stage.setMinWidth(400);
-        stage.setMinHeight(400);
+        stage.setMinHeight(450);
         // save current stage
         controller.setStage(stage);
         // add stylesheets of the root to scene
@@ -140,17 +156,191 @@ public class SinPaletteChoiceDialog extends BaseDialog {
     }
 
     /**
-     * Initialize function, it will be invoked after the scene graph is loaded.
-     * Warning: LineChart is slow (initialize 3000 points approximately 2.5 second).
+     * Gets default palette.
+     *
+     * @return palette
+     */
+    static public IterativePaletteSin getDefaultPalette() {
+        return new IterativePaletteSin();
+    }
+
+    private int getMaxColorPeriod() {
+        return maxColorPeriod.get();
+    }
+
+    private void setMaxColorPeriod(int maxColorPeriod) {
+        this.maxColorPeriod.set(maxColorPeriod);
+    }
+
+    private IntegerProperty maxColorPeriodProperty() {
+        return maxColorPeriod;
+    }
+
+    public int getMaxIter() {
+        return maxIter.get();
+    }
+
+    public void setMaxIter(int maxIter) {
+        this.maxIter.set(maxIter);
+    }
+
+    public IntegerProperty maxIterProperty() {
+        return maxIter;
+    }
+
+    /**
+     * Gets palette.
+     *
+     * @return palette
+     */
+    public final IterativePaletteSin getPalette() {
+        return palette;
+    }
+
+    /**
+     * Sets palette.
+     *
+     * @param palette palette
+     * @throws NullPointerException if palette is null
+     */
+    public final void setPalette(IterativePaletteSin palette) {
+        this.palette = Objects.requireNonNull(palette);
+        currentPalette.setPaletteSettings(palette);
+    }
+
+    /**
+     * Resizes length of the lines at the chart or create it, if they doesn't exist.
+     * Note: {@code currentPalette} must be initialized.
+     *
+     * @param newSize new length of the lines
+     * @throws IllegalArgumentException is newSize < 0
+     */
+    private void resizeChart(int newSize) {
+        if (newSize < 0)
+            throw new IllegalArgumentException("newSize is less than zero");
+
+        // check that lines are created
+        if (lineChart.getData().isEmpty()) {
+            // create empty series
+            lineChart.getData().addAll(
+                    new XYChart.Series<Number, Number>("red", FXCollections.observableArrayList()),
+                    new XYChart.Series<Number, Number>("green", FXCollections.observableArrayList()),
+                    new XYChart.Series<Number, Number>("blue", FXCollections.observableArrayList()));
+        }
+        // get series
+        ObservableList<XYChart.Data<Number, Number>> rLine = lineChart.getData().get(0).getData();
+        ObservableList<XYChart.Data<Number, Number>> gLine = lineChart.getData().get(1).getData();
+        ObservableList<XYChart.Data<Number, Number>> bLine = lineChart.getData().get(2).getData();
+        // check that size is changed (all line size have same size)
+        int oldSize = rLine.size();
+        if (oldSize != newSize) {
+            if (newSize < oldSize) {
+                // reduce lines
+                rLine.remove(newSize, oldSize);
+                gLine.remove(newSize, oldSize);
+                bLine.remove(newSize, oldSize);
+            } else {
+                // increase lines
+                Supplier<XYChart.Data<Number, Number>[]> appendedPoints = () ->
+                        IntStream.range(oldSize + 1, newSize + 1).
+                                mapToObj(x -> new XYChart.Data<Number, Number>(x, 0)).
+                                toArray(XYChart.Data[]::new);
+                rLine.addAll(appendedPoints.get());
+                gLine.addAll(appendedPoints.get());
+                bLine.addAll(appendedPoints.get());
+            }
+            // update limit for x axis
+            NumberAxis xAxis = (NumberAxis) lineChart.getXAxis();
+            xAxis.setLowerBound(1);
+            xAxis.setTickUnit(Math.pow(10, Math.round(Math.log10(newSize)) - 1));
+            xAxis.setUpperBound(newSize);
+            // update chart and canvas
+            updateChart();
+            updateCanvas();
+        }
+    }
+
+    /**
+     * Updates lines on the chart using {@code currentPalette}.
+     * Note: lines must be exists.
+     */
+    private void updateChart() {
+        // get series
+        ObservableList<XYChart.Data<Number, Number>> rLine = lineChart.getData().get(0).getData();
+        ObservableList<XYChart.Data<Number, Number>> gLine = lineChart.getData().get(1).getData();
+        ObservableList<XYChart.Data<Number, Number>> bLine = lineChart.getData().get(2).getData();
+        // calculate colors
+        int maxIter = getMaxIter();
+        IterativePalette pl = currentPalette.createPalette();
+        Color colors[] = IntStream.range(1, maxIter + 1).mapToObj(pl::numIterToColor).toArray(Color[]::new);
+        // update lines
+        for (int i = 0; i < maxIter; i++) {
+            Color c = colors[i];
+            rLine.get(i).setYValue(c.getRed());
+            gLine.get(i).setYValue(c.getGreen());
+            bLine.get(i).setYValue(c.getBlue());
+        }
+    }
+
+    /**
+     * Updates {@code canvasPalette} using {@code currentPalette} and {@code lineChart}.
+     */
+    private void updateCanvas() {
+        // update canvas with some delay
+        if (dataIsUpated.getAndSet(false)) {
+            singlePool.execute(() -> {
+                // delay
+                try {
+                    Thread.sleep(msDelay);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Platform.runLater(() -> {
+                    dataIsUpated.set(true);
+
+                    // get chart content
+                    Region chartContent = (Region) lineChart.getChildrenUnmodifiable().stream()
+                            .filter(c -> c.getStyleClass().contains("chart-content")).findFirst().get();
+                    // get chart plot background
+                    Region chartPlotBackground = (Region) chartContent.getChildrenUnmodifiable().stream()
+                            .filter(c -> c.getStyleClass().contains("chart-plot-background")).findFirst().get();
+                    // width of the chart
+                    double chartWidth = lineChart.getWidth();
+                    // get size of the chart plot background
+                    double plotWidth = chartPlotBackground.getWidth();
+                    // get the width from left side of the chart to right side of the chart-plot-background
+                    double leftIndent = chartWidth - plotWidth - lineChart.getPadding().getRight() - chartContent.getPadding().getRight();
+
+                    // create new gradient
+                    IterativePaletteSin pl = currentPalette.createPalette();
+                    int maxIter = getMaxIter();
+                    Stop[] stops;
+                    if (maxIter > 1) {
+                        stops = IntStream.range(1, maxIter + 1).mapToObj(i -> new Stop((i - 1.0) / (maxIter - 1.0), pl.numIterToColor(i))).toArray(Stop[]::new);
+                    } else if (maxIter == 1) {
+                        stops = new Stop[]{new Stop(0.5, pl.numIterToColor(1))};
+                    } else {
+                        stops = new Stop[]{new Stop(0.5, Color.BLACK)};
+                    }
+                    LinearGradient linearGradient = new LinearGradient(leftIndent, 0, leftIndent + plotWidth, 0, false, CycleMethod.NO_CYCLE, stops);
+
+
+                    // draw rectangle on the canvas
+                    GraphicsContext gc = canvasPalette.getGraphicsContext2D();
+                    gc.setFill(linearGradient);
+                    gc.fillRect(0, 0, canvasPalette.getWidth(), canvasPalette.getHeight());
+                });
+            });
+        }
+    }
+
+    /**
+     * Initialization function, it will be invoked after the scene graph is loaded.
+     * Warning: LineChart is initialized slowly.
      */
     @FXML
     private void initialize() {
-        // set initial value of the currentPalette
-        currentPalette.setPaletteSettings(getPalette());
-        // maximum number of iterations
-        int limitIter = getMaxIter();
-
-
+        // bindings of the currentPalette
         // sliders and labels
         Slider colorsPerSlider[] = {redPeriodSlider, greenPeriodSlider, bluePeriodSlider};
         Label colorsPerLabel[] = {redPeriodLabel, greenPeriodLabel, bluePeriodLabel};
@@ -171,139 +361,53 @@ public class SinPaletteChoiceDialog extends BaseDialog {
             phiSlider.setMax(Math.PI);
             phiSlider.valueProperty().bindBidirectional(colorsPhi0Prop[i]);
             // bind label to the slider
+            // note: bidirectional binding uses because it can covert property with StringConverter
             colorsPhi0Label[i].textProperty().bindBidirectional(phiSlider.valueProperty(), phaseConverter);
 
             // configure period slider
             Slider periodSlider = colorsPerSlider[i];
             periodSlider.setMin(1.0);
-            periodSlider.setMax(limitIter);
+            periodSlider.maxProperty().bind(Bindings.createDoubleBinding(() -> (double) getMaxColorPeriod(), maxColorPeriodProperty()));
             periodSlider.valueProperty().bindBidirectional(colorsPerProp[i]);
             // bind label to slider value
+            // note: bidirectional binding uses because it can covert property with StringConverter
             colorsPerLabel[i].textProperty().bindBidirectional(periodSlider.valueProperty(), periodConverter);
         }
         // configure color picker for choosing color of the fractal
         fractalColor.valueProperty().bindBidirectional(currentPalette.fractalColorProperty());
 
 
-        // create data series for the line chart
-        XYChart.Series<Number, Number> lines[] = new XYChart.Series[3];
-        String lineNames[] = {"red", "green", "blue"};
-        IterativePaletteSin pl = currentPalette.createPalette();
-        IntToDoubleFunction calcsY[] = {
-                x -> pl.numIterToColor(x).getRed(),
-                x -> pl.numIterToColor(x).getGreen(),
-                x -> pl.numIterToColor(x).getBlue()
-        };
-        for (int i = 0; i < 3; i++) {
-            IntToDoubleFunction y = calcsY[i];
-            lines[i] = new XYChart.Series<>(lineNames[i], FXCollections.observableArrayList(
-                    IntStream.range(1, limitIter + 1).mapToObj(x -> new XYChart.Data<Number, Number>(x, y.applyAsDouble(x))).collect(Collectors.toList())
-            ));
-        }
-        // add data to chart
-        lineChart.getData().addAll(lines);
-        // set limit for x axis
-        ((NumberAxis) lineChart.getXAxis()).setUpperBound(limitIter);
-        // calculate tick step
-        double tick = Math.pow(10, Math.round(Math.log10(limitIter)) - 1);
-        ((NumberAxis) lineChart.getXAxis()).setTickUnit(tick);
-        // recalculate lines when current palette is updated
-        currentPalette.addListener(obs -> {
-            IterativePaletteSin newPalette = ((IterativePaletteSinProperty) obs).createPalette();
-            lines[0].getData().stream().forEach(data -> data.setYValue(newPalette.numIterToColor(data.getXValue().intValue()).getRed()));
-            lines[1].getData().stream().forEach(data -> data.setYValue(newPalette.numIterToColor(data.getXValue().intValue()).getGreen()));
-            lines[2].getData().stream().forEach(data -> data.setYValue(newPalette.numIterToColor(data.getXValue().intValue()).getBlue()));
+        // update plot and canvas
+        resizeChart(getMaxIter());
+
+        // update plot when maxIter is changed
+        maxIterProperty().addListener((obj, oldVal, newVal) -> {
+            if (newVal.intValue() < 0)
+                throw new IllegalArgumentException("Value of the maxIter proterty is less that zero: " + newVal);
+            // update plot and canvas
+            resizeChart(newVal.intValue());
         });
 
+        // update plot and canvas if currentPalette is changed
+        currentPalette.addListener(observable -> {
+            updateChart();
+            updateCanvas();
+        });
 
-        // update canvasPalette and fractalColor when currentPalette is changed
-        currentPalette.addListener(obs -> updateCurrentPaletteCanvas());
-        // update canvasPalette when it is resized
-        // Platform#runLater is usage because the listener must be notified when sizes of the chart have been updated
-        canvasPalette.widthProperty().addListener(obs -> Platform.runLater(this::updateCurrentPaletteCanvas));
-    }
-
-
-    /**
-     * Update {@code canvasPalette} using {@code} current palette
-     */
-    private void updateCurrentPaletteCanvas() {
-        // get chart content
-        Region chartContent = (Region) lineChart.getChildrenUnmodifiable().stream()
-                .filter(c -> c.getStyleClass().contains("chart-content")).findFirst().get();
-        // get chart plot background
-        Region chartPlotBackground = (Region) chartContent.getChildrenUnmodifiable().stream()
-                .filter(c -> c.getStyleClass().contains("chart-plot-background")).findFirst().get();
-        // width of the chart
-        double chartWidth = lineChart.getWidth();
-        // get size of the chart plot background
-        double plotWidth = chartPlotBackground.getWidth();
-        // get the width from left side of the chart to right side of the chart-plot-background
-        double leftIndent = chartWidth - plotWidth - lineChart.getPadding().getRight() - chartContent.getPadding().getRight();
-
-        // create new gradient
-        IterativePaletteSin pl = currentPalette.createPalette();
-        int maxI = getMaxIter();
-        Stop[] stops = (maxI > 1 ?
-                IntStream.range(1, maxI + 1).mapToObj(i -> new Stop((i - 1.0) / (maxI - 1.0), pl.numIterToColor(i))).toArray(Stop[]::new) :
-                new Stop[]{new Stop(0.5, pl.numIterToColor(1))});
-        LinearGradient linearGradient = new LinearGradient(leftIndent, 0, leftIndent + plotWidth, 0, false, CycleMethod.NO_CYCLE, stops);
-
-        // draw rectangle on the canvas
-        GraphicsContext gc = canvasPalette.getGraphicsContext2D();
-        gc.setFill(linearGradient);
-        gc.fillRect(0, 0, canvasPalette.getWidth(), canvasPalette.getHeight());
+        // update canvas if width of the chart is resized
+        lineChart.widthProperty().addListener((obj, oldVal, newVal) -> updateCanvas());
     }
 
     /**
-     * Get palette.
-     *
-     * @return palette
-     */
-    public final IterativePaletteSin getPalette() {
-        return palette;
-    }
-
-    /**
-     * Set palette.
-     *
-     * @param palette palette
-     */
-    private final void setPalette(IterativePaletteSin palette) {
-        this.palette = Objects.requireNonNull(palette);
-    }
-
-    /**
-     * Get limit iterations of the ComplexFractalChecker.
-     *
-     * @return limit iterations
-     */
-    public int getMaxIter() {
-        return maxIter;
-    }
-
-    /**
-     * limit iterations of the ComplexFractalChecker.
-     *
-     * @param maxIter limit iterations
-     */
-    private void setMaxIter(int maxIter) {
-        if (maxIter <= 1)
-            throw new IllegalArgumentException("Uncorrected value of the maxIter");
-        this.maxIter = maxIter;
-    }
-
-
-    /**
-     * Reset palette.
+     * Resets palette.
      */
     @FXML
-    private void defalutPalette() {
-        currentPalette.setPaletteSettings(new IterativePaletteSin());
+    private void defaultPalette() {
+        currentPalette.setPaletteSettings(getDefaultPalette());
     }
 
     /**
-     * Save current palette and close window.
+     * Saves current palette and closes window.
      */
     @FXML
     private void savePaletteChanges() {
@@ -314,7 +418,7 @@ public class SinPaletteChoiceDialog extends BaseDialog {
     }
 
     /**
-     * Close window without saving the palette.
+     * Closes window without saving the palette.
      */
     @FXML
     private void cancelPaletteChanges() {
@@ -324,6 +428,9 @@ public class SinPaletteChoiceDialog extends BaseDialog {
         closeWindow();
     }
 
+    /**
+     * Sets color of the fractal as the color in the end of palette.
+     */
     @FXML
     private void setFractalColorAsEndPalette() {
         // get color at the end of the palette

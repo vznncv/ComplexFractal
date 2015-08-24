@@ -11,6 +11,8 @@ import java.util.stream.IntStream;
 
 /**
  * The class {@code ComplexFractalDrawer} draws fractal on the {@link javafx.scene.image.WritableImage}.
+ *
+ * @author Kochin Konstantin Alexandrovich
  */
 public class ComplexFractalDrawer {
     /**
@@ -28,7 +30,7 @@ public class ComplexFractalDrawer {
     private final ReadOnlyIntegerWrapper numberDrawnRows = new ReadOnlyIntegerWrapper(0);
 
     /**
-     * Defines allowance for drawing of the fractal. Uses for premature stopping drawing of the fractal.
+     * Defines allowance for drawing the fractal. Uses for premature stopping drawing the fractal.
      * <p>
      * This property can be used by threads not drawing the fractal. Use setter and getter for thread-safe operation.
      */
@@ -37,7 +39,7 @@ public class ComplexFractalDrawer {
     /**
      * Mutex for setters and getters of the progress, numberDrawnRows and permitWork properties.
      */
-    private  final Object mutex = new Object();
+    private final Object mutex = new Object();
 
     /**
      * Indicator of the drawing process of the fractal.

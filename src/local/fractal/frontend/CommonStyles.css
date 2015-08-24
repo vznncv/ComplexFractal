@@ -94,3 +94,11 @@
 .custom-color-dialog .controls-pane #buttons-hbox {
     -fx-alignment:center;
 }
+
+/* style for a ChoiceBox */
+.choice-box #choice-box-menu-item:focused  {
+    -fx-background-color: derive(DARKSLATEGREY, 40%) ;
+}
+.choice-box #choice-box-popup-menu {
+    -fx-background-color: DARKSLATEGREY ;
+}

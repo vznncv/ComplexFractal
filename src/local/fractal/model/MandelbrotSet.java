@@ -6,19 +6,32 @@ import java.util.Objects;
 
 /**
  * A {@code MandelbrotSet} class checks belonging of a point to Mandelbrot set.
+ * The objects of this class are immutable.
  *
  * @author Kochin Konstantin Alexandrovich
  */
-public class MandelbrotSet extends ComplexFractal {
+public final class MandelbrotSet extends ComplexFractal {
+
+    /**
+     * Constructor.
+     *
+     * @param maxIter   maximum number of the iteration
+     * @param criticalR radius of the bound
+     */
+    public MandelbrotSet(int maxIter, double criticalR) {
+        super(maxIter, criticalR);
+    }
 
 
     /**
-     * Default constructor. It sets maximum number of the iterations in {@code 1024} and radius of the bound in {@code
-     * 2}.
+     * Default constructor.
+     * <p>
+     * matIter = 1024,
+     * <p>
+     * criticalR = 2.0
      */
     public MandelbrotSet() {
-        setMaxIter(1024);
-        setCriticalR(2);
+        super(1024, 2.0);
     }
 
     /**
@@ -29,7 +42,8 @@ public class MandelbrotSet extends ComplexFractal {
         Objects.requireNonNull(p, "p is null");
 
         int maxIter = getMaxIter();
-        int iter = 0;
+        // 1 - special case for point outside of the bound
+        int iter = 1;
         double r2 = getCriticalR() * getCriticalR();
         ComplexNumber startP = new ComplexNumber(p.getX(), p.getY());
         ComplexNumber currentP = new ComplexNumber(0.0, 0.0);
@@ -43,5 +57,13 @@ public class MandelbrotSet extends ComplexFractal {
             iter = 0;
         }
         return iter;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof MandelbrotSet && super.equals(obj);
     }
 }

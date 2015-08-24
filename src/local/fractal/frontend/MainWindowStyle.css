@@ -4,6 +4,7 @@
     -fx-spacing: 8px;
 }
 
+
 /* style of the indicator of the work */
 #workIndicator.waiting {
     -fx-fill: blue;
@@ -14,6 +15,7 @@
     -fx-effect: dropshadow(gaussian, red, 6, 0, 0, 0);
 }
 
+
 /* setting of the control position panel */
 #controlPositionPanel {
     -fx-spacing: 10px;
@@ -23,6 +25,7 @@
     -fx-spacing: 10px;
     -fx-alignment: center-left;
 }
+
 
 /* setting of the panel for choosing the fractal and the palette */
 #fractalSettingsPanel {

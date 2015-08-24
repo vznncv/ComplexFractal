@@ -46,7 +46,7 @@
             </GridPane>
             <BorderPane fx:id="progressPanel">
                 <left>
-                    <ProgressIndicator progress="${progressBar.progress}" />
+                    <ProgressIndicator progress="${progressBar.progress}"/>
                 </left>
                 <center>
                     <ProgressBar fx:id="progressBar"/>

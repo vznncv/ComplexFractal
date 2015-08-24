@@ -16,7 +16,6 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import local.fractal.model.ComplexFractal;
-import local.fractal.model.MandelbrotSet;
 import local.fractal.util.ComplexFractalCanvasDrawer;
 import local.fractal.util.IterativePaletteSin;
 
@@ -25,7 +24,7 @@ import java.io.UncheckedIOException;
 import java.util.List;
 
 /**
- * It's controller of the main window.
+ * The {@code } represents controller of the main window.
  *
  * @author Kochin Konstantin Alexandrovich
  */
@@ -33,10 +32,11 @@ public class MainWindow {
     // helper dialogs
     SinPaletteChoiceDialog sinPaletteChoiceDialog;
     SaveDialog saveDialog;
+    ChooseComplexFractalDialog chooseComplexFractalDialog;
     // root node of the window
     @FXML
     private Parent root;
-    // Drawer of the fractal
+    // drawer of the fractal
     private ComplexFractalCanvasDrawer fd;
     // canvas for painting
     @FXML
@@ -56,9 +56,9 @@ public class MainWindow {
     private double yMouseCanvas;
 
     /**
-     * Construct window of the program.
-     * This method construct and set {@code scene}, set window title and minimal size of the window,
-     * but doesn't show window.     *
+     * Constructs window of the program.
+     * This method construct and set {@code scene}, set window title and minimal size of the window, but doesn't show
+     * window.
      *
      * @param stage stage of the window
      * @return controller of this window
@@ -84,10 +84,12 @@ public class MainWindow {
     }
 
     /**
-     * Initialize function, it will be invoked after the scene graph is loaded.
+     * Initialization function, it will be invoked after the scene graph is loaded.
      */
     public void initialize() {
-        fd = new ComplexFractalCanvasDrawer(mainCanvas, new MandelbrotSet());
+        fd = new ComplexFractalCanvasDrawer(mainCanvas, ChooseComplexFractalDialog.getDefaultComplexFractal(), SinPaletteChoiceDialog.getDefaultPalette());
+        //fd = new ComplexFractalCanvasDrawer(mainCanvas, new JuliaSet(), SinPaletteChoiceDialog.getDefaultPalette());
+        //fd = new ComplexFractalCanvasDrawer(mainCanvas, new ComplexFractalVersion1(), SinPaletteChoiceDialog.getDefaultPalette());
         // set indicator of the working
         InvalidationListener updateWorkIndicator = (obs) -> {
             boolean status = ((ReadOnlyBooleanProperty) obs).get();
@@ -103,7 +105,7 @@ public class MainWindow {
     }
 
     /**
-     * Determine the zoom option.
+     * Determines the zoom option.
      *
      * @return true if "zoom in" is chosen, false if "zoom out" is chosen
      */
@@ -122,7 +124,7 @@ public class MainWindow {
     }
 
     /**
-     * Determine the shift/rotate option.
+     * Determines the shift/rotate option.
      *
      * @return true if "shift" is chosen, false if "rotate" is chosen
      */
@@ -141,7 +143,7 @@ public class MainWindow {
     }
 
     /**
-     * Drag mouse on canvas.
+     * Drags mouse on canvas.
      *
      * @param event mouse event
      */
@@ -175,7 +177,7 @@ public class MainWindow {
     }
 
     /**
-     * Start dragging mouse on the canvas.
+     * Starts dragging mouse on the canvas.
      *
      * @param event mouse event
      */
@@ -187,7 +189,7 @@ public class MainWindow {
     }
 
     /**
-     * Restore zoom and position setting to default.
+     * Restores zoom and position setting to default.
      *
      * @param actionEvent button event
      */
@@ -197,7 +199,7 @@ public class MainWindow {
     }
 
     /**
-     * Zoom fractal.
+     * Zooms fractal.
      *
      * @param event mouse event
      */
@@ -213,12 +215,12 @@ public class MainWindow {
     }
 
     /**
-     * Open save dialog
+     * Opens save dialog.
      */
     @FXML
     private void openSaveDialog() throws IOException {
         // create new dialog window if this is required
-        if (saveDialog == null ) {
+        if (saveDialog == null) {
             // create new stage
             Stage saveDialogWindow = new Stage();
             saveDialogWindow.initOwner(root.getScene().getWindow());
@@ -236,33 +238,39 @@ public class MainWindow {
     }
 
     /**
-     * Open choosing palette dialog.
+     * Opens choosing palette dialog.
      */
     @FXML
     private void openSinPaletteChoiceDioalog() {
         // get and check palette
         if (!(fd.getPalette() instanceof IterativePaletteSin)) {
-            new Alert(Alert.AlertType.ERROR, "It cannot modify that palette type.");
+            new Alert(Alert.AlertType.ERROR, "It cannot modify that palette type.").show();
             return;
         }
         IterativePaletteSin palette = (IterativePaletteSin) fd.getPalette();
 
         // get limit iterations of the ComplexFractalChecker
         if (!(fd.getFractal() instanceof ComplexFractal)) {
-            new Alert(Alert.AlertType.ERROR, "It cannot modify that palette type with that type of the fractal.");
+            new Alert(Alert.AlertType.ERROR, "It cannot modify that palette type with that type of the fractal.").show();
             return;
         }
         ComplexFractal fractalChecker = (ComplexFractal) fd.getFractal();
 
         // create new dialog window if this is required
-        if (sinPaletteChoiceDialog == null || sinPaletteChoiceDialog.getMaxIter() != fractalChecker.getMaxIter()) {
+        if (sinPaletteChoiceDialog == null) {
             // create new stage
             Stage paletteDialogWindow = new Stage();
             paletteDialogWindow.initOwner(root.getScene().getWindow());
             paletteDialogWindow.initModality(Modality.WINDOW_MODAL);
             // construct window
-            sinPaletteChoiceDialog = SinPaletteChoiceDialog.createWindow(paletteDialogWindow, palette, fractalChecker.getMaxIter());
+            sinPaletteChoiceDialog = SinPaletteChoiceDialog.createWindow(paletteDialogWindow);
         }
+
+        // set current palette
+        sinPaletteChoiceDialog.setPalette(palette);
+        // set maximum numbers of the iterations
+        sinPaletteChoiceDialog.setMaxIter(fractalChecker.getMaxIter());
+
 
         // show dialog
         sinPaletteChoiceDialog.showAndWait();
@@ -271,13 +279,34 @@ public class MainWindow {
         fd.setPalette(sinPaletteChoiceDialog.getPalette());
     }
 
-
     /**
-     * Open choosing fractal dialog.
+     * Opens choosing fractal dialog.
      */
     @FXML
     private void openComplexFractalDialog() {
-        // stub
-        new Alert(Alert.AlertType.ERROR, "Dialog isn't available yet.").showAndWait();
+        // get and check current fractal
+        if (!(ChooseComplexFractalDialog.isSupportComplexFractal(fd.getFractal()))) {
+            new Alert(Alert.AlertType.ERROR, "It cannot modify that type of the fractal.").show();
+            return;
+        }
+
+        // create new dialog window if this is required
+        if (chooseComplexFractalDialog == null) {
+            // create new stage
+            Stage paletteDialogWindow = new Stage();
+            paletteDialogWindow.initOwner(root.getScene().getWindow());
+            paletteDialogWindow.initModality(Modality.WINDOW_MODAL);
+            // construct window
+            chooseComplexFractalDialog = ChooseComplexFractalDialog.createWindow(paletteDialogWindow);
+        }
+
+        // set current complex fractal
+        chooseComplexFractalDialog.setComplexFractal((ComplexFractal) fd.getFractal());
+
+        // show dialog
+        chooseComplexFractalDialog.showAndWait();
+
+        // save new fractal
+        fd.setFractal(chooseComplexFractalDialog.getComplexFractal());
     }
 }
