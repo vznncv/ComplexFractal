@@ -38,9 +38,9 @@ public final class ComplexFractalVersion1 extends ComplexFractal {
      * <p>
      * {@code F(z) = z^6 + z^1 + c}
      * <p>
-     * matIter = 1024,
+     * {@code matIter = 1024},
      * <p>
-     * criticalR = 2.0
+     * {@code criticalR = 2.0}
      */
     public ComplexFractalVersion1() {
         this(6, 1, 1024, 2.0);

@@ -13,26 +13,26 @@
     </stylesheets>
 
 
-    <!-- canvas for drawing the fractal -->
+    <!-- Canvas for drawing the fractal -->
     <center>
         <Canvas fx:id="mainCanvas" height="${root.height-120}" width="${root.width-40}"
                 onMouseDragged="#canvasMouseDrag" onMousePressed="#canvasMousePressed"
                 onMouseClicked="#canvasMouseClicked"/>
     </center>
 
-    <!-- control elements -->
+    <!-- Control elements -->
     <bottom>
         <HBox fx:id="controlPanel" styleClass="borderControlPanel">
 
-            <!-- working indicator -->
+            <!-- Working indicator -->
             <Circle fx:id="workIndicator" radius="10"/>
 
             <Separator orientation="VERTICAL"/>
 
-            <!-- control of the zoom and position panel -->
+            <!-- Control of the zoom and position panel -->
             <HBox fx:id="controlPositionPanel">
 
-                <!-- restoring default setting -->
+                <!-- Restoring default setting -->
                 <Button fx:id="restoreDefaultButton" text="Default"
                         GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.rowSpan="2"
                         onAction="#canvasDefaultScale">
@@ -41,7 +41,7 @@
                     </tooltip>
                 </Button>
 
-                <!-- control of the zoom -->
+                <!-- Control of the zoom -->
                 <VBox fx:id="controlZoomPane">
                     <fx:define>
                         <ToggleGroup fx:id="zoomToggleGroup"/>
@@ -59,7 +59,7 @@
                     </RadioButton>
                 </VBox>
 
-                <!-- control of the rotate and shift -->
+                <!-- Control of the rotate and shift -->
                 <VBox fx:id="controlRotateShiftPane">
                     <fx:define>
                         <ToggleGroup fx:id="rotateShiftToggleGroup"/>
@@ -83,14 +83,14 @@
 
             <Separator orientation="VERTICAL"/>
 
-            <!-- fractal and palette settings -->
+            <!-- Fractal and palette settings -->
             <VBox fx:id="fractalSettingsPanel">
                 <Button text="Choose fractal" onAction="#openComplexFractalDialog">
                     <tooltip>
                         <Tooltip text="Chose the type of the fractal"/>
                     </tooltip>
                 </Button>
-                <Button text="Palette settings" onAction="#openSinPaletteChoiceDioalog">
+                <Button text="Palette settings" onAction="#openSinPaletteChoiceDialog">
                     <tooltip>
                         <Tooltip text="Fractal color setting"/>
                     </tooltip>
@@ -99,7 +99,7 @@
 
             <Separator orientation="VERTICAL"/>
 
-            <!-- save current image to the file -->
+            <!-- Save current image to the file -->
             <Button text="Save" onAction="#openSaveDialog">
                 <tooltip>
                     <Tooltip text="Save current view"/>

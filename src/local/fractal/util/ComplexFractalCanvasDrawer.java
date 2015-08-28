@@ -326,7 +326,7 @@ public class ComplexFractalCanvasDrawer {
 
 
     /**
-     * Performs translate of the fractal on the canvas.
+     * Performs translation of the fractal on the canvas.
      *
      * @param dx x translate (in the pixels)
      * @param dy y translate (in the pixels)

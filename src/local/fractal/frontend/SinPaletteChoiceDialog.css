@@ -4,7 +4,7 @@
 }
 
 
-/* styles of the settings of the background colors of the fractal */
+/* Style of the settings of the background colors of the fractal */
 #backgroundPaletteSettings {
     -fx-hgap: 10px;
     -fx-vgap: 10px;
@@ -35,7 +35,7 @@
 }
 
 
-/* styles of the chart */
+/* Style of the chart */
 #lineChart {
     -fx-legend-visible: false;
     -fx-create-symbols: false;
@@ -57,14 +57,14 @@
 }
 
 
-/* styles of the settings of the fractal color */
+/* Style of the settings of the fractal color */
 #fractalColorSettings {
     -fx-alignment: center;
     -fx-spacing: 10px;
 }
 
 
-/* style of the control buttons */
+/* Style of the control buttons */
 #actionPanel {
     -fx-alignment: center;
     -fx-spacing: 10px;

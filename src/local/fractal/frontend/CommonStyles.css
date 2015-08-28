@@ -1,4 +1,4 @@
-/* common styles for all elements */
+/* Common style for all elements */
 * {
     -fx-color: DARKCYAN; /* see caspian.css */
     -fx-font-family: "Arial Narrow";
@@ -6,7 +6,7 @@
 }
 
 
-/* style of the root element */
+/* Style of the root element */
 .root {
     -fx-background-image: url("background.png");
     -fx-padding: 5px;
@@ -17,7 +17,13 @@
 }
 
 
-/* styles for buttons */
+/* Style of the text nodes */
+Text {
+    -fx-fill: white;
+}
+
+
+/* Style for buttons */
 .button {
     -fx-font-weight: bold;
     -fx-background-color: -fr-button-non-pressed;
@@ -27,17 +33,22 @@
 .button:pressed {
     -fx-background-color: -fr-button-pressed;
 }
-/* styles for text fields */
+
+
+/* Style for text fields */
 .text-field {
     -fx-control-inner-background: derive(WHITE, -20%);
     -fx-text-fill: derive(BLACK, 20%);
 }
 
-/* styles for radio-buttons */
+
+/* Style for radio-buttons */
 .radio-button {
     -fx-mark-highlight-color: DARKSLATEGREY;
 }
-/* common style for separators */
+
+
+/* Style for separators */
 .separator .line {
     -fx-border-style: solid;
     -fx-border-width: 1px;
@@ -46,7 +57,8 @@
     -fx-effect: dropshadow(gaussian, DARKSLATEGREY, 4, 0, 0, 0);
 }
 
-/* style of border for panels */
+
+/* Style of border for panels */
 .borderControlPanel {
     -fx-border-width: 2px;
     -fx-border-color: DARKSLATEGREY;
@@ -55,14 +67,15 @@
     -fx-effect: dropshadow(gaussian, DARKSLATEGREY, 4, 0, 0, 0);
 }
 
-/* unlimited size of the all buttons */
+
+/* Unlimited size of the all buttons */
 .button {
     -fx-max-height: infinity;
     -fx-max-width: infinity;
 }
 
 
-/* styles for color picker */
+/* Style for ColorPicker */
 .color-picker {
     -fx-font-weight: bold;
     -fx-background-color: -fr-button-non-pressed;
@@ -95,7 +108,8 @@
     -fx-alignment:center;
 }
 
-/* style for a ChoiceBox */
+
+/* Style for a ChoiceBox */
 .choice-box #choice-box-menu-item:focused  {
     -fx-background-color: derive(DARKSLATEGREY, 40%) ;
 }

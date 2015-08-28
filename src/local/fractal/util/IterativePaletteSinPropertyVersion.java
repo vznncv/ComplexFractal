@@ -60,13 +60,16 @@ public class IterativePaletteSinPropertyVersion implements Observable {
      * @defaultValue Color.BLACK
      */
     private SimpleObjectProperty<Color> fractalColor = new SimpleObjectProperty<>(Color.BLACK);
+
     /**
      * Default constructor.
      */
     public IterativePaletteSinPropertyVersion() {
     }
+
     /**
      * Constructor.
+     *
      * @param palette palette for getting starting settings.
      */
     public IterativePaletteSinPropertyVersion(IterativePaletteSin palette) {
@@ -74,10 +77,10 @@ public class IterativePaletteSinPropertyVersion implements Observable {
     }
 
     /**
-     * Converts phase to range [-PI/2; PI/2].
+     * Converts phase to range [-PI; PI].
      *
      * @param phase phase in unlimited rang
-     * @return phase in range [-PI/2; PI/2]
+     * @return phase in range [-PI; PI]
      */
     private static double correctPhase(double phase) {
         phase = phase % (2 * Math.PI);
@@ -181,7 +184,7 @@ public class IterativePaletteSinPropertyVersion implements Observable {
         setPerR(pl.getPerR());
         setPerG(pl.getPerG());
         setPerB(pl.getPerB());
-        // it's desirable that initial phases are limited with the range from -PI/2 to PI/2
+        // it's desirable that initial phases are limited with the range from -PI to PI
         setPhi0R(correctPhase(pl.getPhi0R()));
         setPhi0G(correctPhase(pl.getPhi0G()));
         setPhi0B(correctPhase(pl.getPhi0B()));

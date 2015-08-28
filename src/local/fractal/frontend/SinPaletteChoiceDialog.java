@@ -53,14 +53,14 @@ public class SinPaletteChoiceDialog extends BaseDialog {
     // canvas for display palette
     @FXML
     private Canvas canvasPalette;
-    // Helper object for corrected canvasPalette updates
-    // (GraphicsContext size changes later than Canvas size)
+    // helper object for corrected canvasPalette updates
+    // (size of GraphicsContext lfchanges later than Canvas size)
     private ExecutorService singlePool = Executors.newSingleThreadExecutor((task) -> {
         Thread t = new Thread(task);
         t.setDaemon(true);
         return t;
     });
-    private AtomicBoolean dataIsUpated = new AtomicBoolean(true);
+    private AtomicBoolean dataIsUpdated = new AtomicBoolean(true);
     private int msDelay = 100;
     // chart
     @FXML
@@ -120,7 +120,7 @@ public class SinPaletteChoiceDialog extends BaseDialog {
     }
 
     /**
-     * Construct window for choosing palette.
+     * Constructs window for choosing palette.
      *
      * @param stage window of the choosing palette dialog
      * @return controller of the window
@@ -223,9 +223,9 @@ public class SinPaletteChoiceDialog extends BaseDialog {
         if (lineChart.getData().isEmpty()) {
             // create empty series
             lineChart.getData().addAll(
-                    new XYChart.Series<Number, Number>("red", FXCollections.observableArrayList()),
-                    new XYChart.Series<Number, Number>("green", FXCollections.observableArrayList()),
-                    new XYChart.Series<Number, Number>("blue", FXCollections.observableArrayList()));
+                    new XYChart.Series<>("red", FXCollections.observableArrayList()),
+                    new XYChart.Series<>("green", FXCollections.observableArrayList()),
+                    new XYChart.Series<>("blue", FXCollections.observableArrayList()));
         }
         // get series
         ObservableList<XYChart.Data<Number, Number>> rLine = lineChart.getData().get(0).getData();
@@ -243,7 +243,7 @@ public class SinPaletteChoiceDialog extends BaseDialog {
                 // increase lines
                 Supplier<XYChart.Data<Number, Number>[]> appendedPoints = () ->
                         IntStream.range(oldSize + 1, newSize + 1).
-                                mapToObj(x -> new XYChart.Data<Number, Number>(x, 0)).
+                                mapToObj(x -> new XYChart.Data<>(x, 0)).
                                 toArray(XYChart.Data[]::new);
                 rLine.addAll(appendedPoints.get());
                 gLine.addAll(appendedPoints.get());
@@ -287,7 +287,7 @@ public class SinPaletteChoiceDialog extends BaseDialog {
      */
     private void updateCanvas() {
         // update canvas with some delay
-        if (dataIsUpated.getAndSet(false)) {
+        if (dataIsUpdated.getAndSet(false)) {
             singlePool.execute(() -> {
                 // delay
                 try {
@@ -296,7 +296,7 @@ public class SinPaletteChoiceDialog extends BaseDialog {
                     e.printStackTrace();
                 }
                 Platform.runLater(() -> {
-                    dataIsUpated.set(true);
+                    dataIsUpdated.set(true);
 
                     // get chart content
                     Region chartContent = (Region) lineChart.getChildrenUnmodifiable().stream()
@@ -336,7 +336,7 @@ public class SinPaletteChoiceDialog extends BaseDialog {
 
     /**
      * Initialization function, it will be invoked after the scene graph is loaded.
-     * Warning: LineChart is initialized slowly.
+     * Warning: LineChart is being initialized slowly.
      */
     @FXML
     private void initialize() {
@@ -349,9 +349,9 @@ public class SinPaletteChoiceDialog extends BaseDialog {
         // property for bidirectional binding
         DoubleProperty colorsPerProp[] = {currentPalette.perRProperty(), currentPalette.perGProperty(), currentPalette.perBProperty()};
         DoubleProperty colorsPhi0Prop[] = {currentPalette.phi0RProperty(), currentPalette.phi0GProperty(), currentPalette.phi0BProperty()};
-        // helper string converter of the phase
+        // helper string converter for the phase
         NumberStringConverter phaseConverter = new NumberStringConverter(new DecimalFormat("0.00"));
-        // helper string converter of the period
+        // helper string converter for the period
         NumberStringConverter periodConverter = new NumberStringConverter(new DecimalFormat("0.00"));
         // configure sliders and listeners for labels
         for (int i = 0; i < 3; i++) {
@@ -383,7 +383,7 @@ public class SinPaletteChoiceDialog extends BaseDialog {
         // update plot when maxIter is changed
         maxIterProperty().addListener((obj, oldVal, newVal) -> {
             if (newVal.intValue() < 0)
-                throw new IllegalArgumentException("Value of the maxIter proterty is less that zero: " + newVal);
+                throw new IllegalArgumentException("Value of the maxIter property is less that zero: " + newVal);
             // update plot and canvas
             resizeChart(newVal.intValue());
         });

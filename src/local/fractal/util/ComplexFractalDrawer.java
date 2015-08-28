@@ -121,7 +121,7 @@ public class ComplexFractalDrawer {
      * <li>origin of coordinate will be in the center of the image;</li>
      * <li>the axes have same scale;</li>
      * <li>the axes have such scale that points (1, 1), (1, -1), (-1, -1), (-1, -1) are on border of the image (square
-     * in the center of the image and edge size 2 is guarantee placed on the image);</li>
+     * in the center of the image with edge size 2 is guarantee placed on the image);</li>
      * <li>x axis is from left to right</li>
      * <li>y axis is from bottom to top.</li>
      * </ul>
@@ -130,7 +130,7 @@ public class ComplexFractalDrawer {
      * @param h height of the image
      * @return initial transform
      */
-    public static Point2DTransformer calculateInitialTransform(int w, int h) {
+    public static Point2DTransformer calculateInitialTransform(double w, double h) {
         // coordinate of the center of the image
         final double centerX = 0;
         final double centerY = 0;
@@ -148,18 +148,18 @@ public class ComplexFractalDrawer {
             double scale = 2 * minR / w;
             preTr = preTr.scale(scale, scale);
             // move the center of the coordinate
-            preTr = preTr.translation(-minR + centerX, -minR * ((double) h / (double) w) + centerY);
+            preTr = preTr.translation(-minR + centerX, -minR * (h / w) + centerY);
         } else {
             // scale coordinate
             double scale = 2 * minR / h;
             preTr = preTr.scale(scale, scale);
             // move the center of the coordinate
-            preTr = preTr.translation(-minR * ((double) w / (double) h) + centerX, -minR + centerY);
+            preTr = preTr.translation(-minR * (w / h) + centerX, -minR + centerY);
         }
         // image has x axis from left to right and
         // y axis from top to bottom.
         // modify the direction of y coordinate from bottom to top
-        preTr.scale(1, -1);
+        preTr = preTr.scale(1, -1);
 
         return preTr;
     }
@@ -234,8 +234,8 @@ public class ComplexFractalDrawer {
     }
 
     /**
-     * Draws the fractal. If image will be set new image when the fractal is being drawn then method continues to draw
-     * on the old image. It's possible to get status of the drawing progress in the other thread.
+     * Draws the fractal. If new image will be set when the fractal is being drawn then method continues to draw on the
+     * old image. It's possible to get status of the drawing progress in the other thread.
      *
      * @param resTr transform matrix for the points of the image
      * @param fCh   checker of the fractal

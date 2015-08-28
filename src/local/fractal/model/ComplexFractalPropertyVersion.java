@@ -37,7 +37,7 @@ public abstract class ComplexFractalPropertyVersion<T extends ComplexFractal> {
         criticalR.set(val);
     }
 
-    public StringProperty crititcalRProperty() {
+    public StringProperty criticalRProperty() {
         return criticalR;
     }
 
@@ -74,7 +74,7 @@ public abstract class ComplexFractalPropertyVersion<T extends ComplexFractal> {
     public abstract void setComplexFractalSettings(T val);
 
     /**
-     * Create complex fractal using current settings.
+     * Creates complex fractal using current settings.
      *
      * @return complex fractal
      * @throws IllegalStateException if any of the properties is uncorrected
@@ -111,7 +111,7 @@ public abstract class ComplexFractalPropertyVersion<T extends ComplexFractal> {
      * Gets a maxIter as int.
      *
      * @return maxIter
-     * @throws IllegalStateException if maxIter property isn't string of integer number or less that one
+     * @throws IllegalStateException if maxIter property isn't string representing integer number or less that one
      */
     protected int parseMaxIter() {
         int maxIter;

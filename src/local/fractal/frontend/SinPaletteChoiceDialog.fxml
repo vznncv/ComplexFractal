@@ -15,7 +15,7 @@
 
     <center>
         <VBox fx:id="allPaletteSettings">
-            <!-- color settings of the fractal background -->
+            <!-- Color settings of the fractal background -->
             <GridPane fx:id="backgroundPaletteSettings">
                 <columnConstraints>
                     <ColumnConstraints prefWidth="50"/>
@@ -23,7 +23,7 @@
                     <ColumnConstraints hgrow="ALWAYS"/>
                 </columnConstraints>
 
-                <!-- tips -->
+                <!-- Tips -->
                 <fx:define>
                     <Tooltip fx:id="colorTooltip"
                              text="color = sin((n - 1) * 2 * PI / p + phi0) / 2.0 + 0.5,&#xA;where:&#xA;color - color (red, green or blue) (from 0.0 to 1.0),&#xA;n - number of the iteration,&#xA;p - period of the color,&#xA;phi0 - initial phase of the color."/>
@@ -41,8 +41,6 @@
                 <Label GridPane.rowIndex="0" GridPane.columnIndex="2" GridPane.halignment="CENTER"
                        text="Initial phase" tooltip="$colorTooltip"/>
                 <!-- Red color -->
-
-
                 <Label GridPane.rowIndex="1" GridPane.columnIndex="0" fx:id="redLabel" text="Red"
                        tooltip="$redColorTooltip"/>
                 <BorderPane GridPane.rowIndex="1" GridPane.columnIndex="1">
@@ -102,7 +100,7 @@
             </GridPane>
 
 
-            <!-- Graphic -->
+            <!-- Chart -->
             <LineChart fx:id="lineChart" animated="false">
                 <xAxis>
                     <NumberAxis lowerBound="1" autoRanging="false" label="Iterations"/>
@@ -116,7 +114,8 @@
             <!-- This pane is used as wrapper for the canvas with minWidth="0" -->
             <BorderPane minWidth="0">
                 <center>
-                    <Canvas BorderPane.alignment="CENTER_RIGHT" fx:id="canvasPalette" width="${lineChart.width}" height="40"/>
+                    <Canvas BorderPane.alignment="CENTER_RIGHT" fx:id="canvasPalette" width="${lineChart.width}"
+                            height="40"/>
                 </center>
             </BorderPane>
 
@@ -130,7 +129,7 @@
         </VBox>
     </center>
 
-    <!-- buttons for applying/canceling changes -->
+    <!-- Buttons for applying/canceling changes -->
     <bottom>
         <HBox fx:id="actionPanel" styleClass="borderControlPanel">
             <Button text="apply" onAction="#savePaletteChanges"/>

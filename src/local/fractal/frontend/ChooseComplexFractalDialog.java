@@ -63,22 +63,22 @@ public class ChooseComplexFractalDialog extends BaseDialog {
      * Constructor.
      */
     private ChooseComplexFractalDialog() {
-        // initialize fractal producers (mandelbrotSetProducer, juliaSetProducer, complexFractalVersion1Producer) the default values
+        // initialize fractal producers (mandelbrotSetProducer, juliaSetProducer, complexFractalVersion1Producer) to default values
         mandelbrotSetProducer = new MandelbrotSetPropertyVersion(new MandelbrotSet());
         juliaSetProducer = new JuliaSetPropertyVersion(new JuliaSet());
         complexFractalVersion1Producer = new ComplexFractalVersion1PropertyVersion(new ComplexFractalVersion1());
     }
 
     /**
-     * Construct window for choosing complex fractal.
+     * Constructs window for choosing complex fractal.
      *
-     * @param stage          window for the dialog
+     * @param stage window for the dialog
      * @return controller of the window
      */
     public static ChooseComplexFractalDialog createWindow(Stage stage) {
         // load the graph scene
         FXMLLoader fxmlLoader = new FXMLLoader(ChooseComplexFractalDialog.class.getResource("ChooseComplexFractalDialog.fxml"));
-        fxmlLoader.setControllerFactory(obj->new ChooseComplexFractalDialog());
+        fxmlLoader.setControllerFactory(obj -> new ChooseComplexFractalDialog());
         Parent root;
         try {
             root = fxmlLoader.load();
@@ -116,7 +116,7 @@ public class ChooseComplexFractalDialog extends BaseDialog {
      * Determines that this dialog supports this type of the fractal.
      *
      * @param fractal complex fractal
-     * @return true, if dialog support that type of the fractal, otherwise false
+     * @return true, if dialog supports that type of the fractal, otherwise false
      */
     public static boolean isSupportComplexFractal(ComplexFractalChecker fractal) {
         if (fractal instanceof MandelbrotSet) {
@@ -126,7 +126,7 @@ public class ChooseComplexFractalDialog extends BaseDialog {
         } else if (fractal instanceof ComplexFractalVersion1) {
             return true;
         } else {
-            throw new IllegalArgumentException("Unknown type of the complex fractal");
+            return false;
         }
     }
 
@@ -140,11 +140,11 @@ public class ChooseComplexFractalDialog extends BaseDialog {
     }
 
     /**
-     * Set {@code ComplexFractal} for displaying and editing.
+     * Sets {@code ComplexFractal} for displaying and editing.
      *
      * @param complexFractal complex fractal
      * @throws NullPointerException     if complexFractal is null
-     * @throws IllegalArgumentException complexFractal is unsupported
+     * @throws IllegalArgumentException if complexFractal is unsupported
      */
     public void setComplexFractal(ComplexFractal complexFractal) {
         this.complexFractal = Objects.requireNonNull(complexFractal);
@@ -166,7 +166,7 @@ public class ChooseComplexFractalDialog extends BaseDialog {
     }
 
     /**
-     * Gets {@code Note} with settings of {@code complexFractal}.
+     * Gets {@code Node} with settings of {@code complexFractal}.
      *
      * @param complexFractal complex fractal
      * @return node with settings
@@ -185,7 +185,7 @@ public class ChooseComplexFractalDialog extends BaseDialog {
     }
 
     /**
-     * Initialize function, it will be invoked after the scene graph is loaded.
+     * Initialization function, it will be invoked after the scene graph is loaded.
      */
     @FXML
     private void initialize() {
@@ -213,20 +213,21 @@ public class ChooseComplexFractalDialog extends BaseDialog {
         // add validators to the settings of complex fractal version 1
         TextFormatterUtil.setIntegerRange(complexFractalVersion1ParamN1, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.valueOf(complexFractalVersion1Producer.getN1()));
         TextFormatterUtil.setIntegerRange(complexFractalVersion1ParamN2, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.valueOf(complexFractalVersion1Producer.getN2()));
-        // binding properties of the Mandelbrot set producer to text fields
-        mandelbrotSetProducer.crititcalRProperty().bindBidirectional(complexFractalParamCriticalR.textProperty());
+        // bind properties of the Mandelbrot set producer to text fields
+        mandelbrotSetProducer.criticalRProperty().bindBidirectional(complexFractalParamCriticalR.textProperty());
         mandelbrotSetProducer.maxIterProperty().bindBidirectional(complexFractalParamMaxIter.textProperty());
-        // binding properties of the Julia set producer to text fields
-        juliaSetProducer.crititcalRProperty().bindBidirectional(complexFractalParamCriticalR.textProperty());
+        // bind properties of the Julia set producer to text fields
+        juliaSetProducer.criticalRProperty().bindBidirectional(complexFractalParamCriticalR.textProperty());
         juliaSetProducer.maxIterProperty().bindBidirectional(complexFractalParamMaxIter.textProperty());
         juliaSetProducer.c1Property().bindBidirectional(juliaSetParamC1.textProperty());
         juliaSetProducer.c2Property().bindBidirectional(juliaSetParamC2.textProperty());
-        // binding properties of the complex fractal version 1 producer to text fields
-        complexFractalVersion1Producer.crititcalRProperty().bindBidirectional(complexFractalParamCriticalR.textProperty());
+        // bind properties of the complex fractal version 1 producer to text fields
+        complexFractalVersion1Producer.criticalRProperty().bindBidirectional(complexFractalParamCriticalR.textProperty());
         complexFractalVersion1Producer.maxIterProperty().bindBidirectional(complexFractalParamMaxIter.textProperty());
         complexFractalVersion1Producer.n1Property().bindBidirectional(complexFractalVersion1ParamN1.textProperty());
         complexFractalVersion1Producer.n2Property().bindBidirectional(complexFractalVersion1ParamN2.textProperty());
     }
+
 
     /**
      * Saves current fractal and closes window.
@@ -238,7 +239,6 @@ public class ChooseComplexFractalDialog extends BaseDialog {
         // close window
         closeWindow();
     }
-
 
     /**
      * Resets all fractal settings to default.
@@ -252,7 +252,6 @@ public class ChooseComplexFractalDialog extends BaseDialog {
         setComplexFractal(getDefaultComplexFractal());
     }
 
-
     /**
      * Closes window without saving the current fractal.
      */
@@ -261,6 +260,4 @@ public class ChooseComplexFractalDialog extends BaseDialog {
         // close window
         closeWindow();
     }
-
-
 }

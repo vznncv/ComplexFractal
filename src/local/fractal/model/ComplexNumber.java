@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 /**
  * The {@code ComplexNumber} is helper class for complex calculation. This class doesn't check case with NaN in the
- * real and image part of a complex number. This class is mutable.
+ * real and image part of a complex number. Objects of this class are mutable.
  */
 public final class ComplexNumber {
     // pattern for searching the complex number
@@ -42,6 +42,7 @@ public final class ComplexNumber {
 
     /**
      * Copy constructor.
+     *
      * @param val object for copying
      */
     public ComplexNumber(ComplexNumber val) {

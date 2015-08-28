@@ -9,6 +9,7 @@
         <URL value="@CommonStyles.css"/>
         <URL value="@SaveDialogStyle.css"/>
     </stylesheets>
+
     <center>
         <VBox fx:id="saveSettingPanel">
             <BorderPane fx:id="chooseFilePanel">
@@ -23,7 +24,6 @@
                     </BorderPane>
                 </center>
             </BorderPane>
-
 
             <GridPane fx:id="sizeSettingPanel">
                 <columnConstraints>
@@ -61,6 +61,5 @@
             <Button fx:id="cancelButton" onAction="#cancel" text="Cancel"/>
         </HBox>
     </bottom>
-
 
 </BorderPane>

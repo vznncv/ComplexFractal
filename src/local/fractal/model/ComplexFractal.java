@@ -3,7 +3,7 @@ package local.fractal.model;
 import local.fractal.util.Point2D;
 
 /**
- * A {@code ComplexFractal} is base class for Mandelbrot set and Julia set.
+ * A {@code ComplexFractal} is base class for the fractals.
  *
  * @author Kochin Konstantin Alexandrovich
  */
@@ -38,8 +38,8 @@ public abstract class ComplexFractal implements ComplexFractalChecker {
     }
 
     /**
-     * Checks that point belongs the fractal. This method gets the coordinate of the point on plane and returns 0, if
-     * it's point of the fractal, otherwise number of iterations when the point goes beyond the circle bound.
+     * Checks that point belongs the fractal. This method gets the coordinate of the point on complex plane and returns
+     * 0, if it's point of the fractal, otherwise number of iterations when the point goes beyond the circle bound.
      *
      * @param p point
      * @return {@code 0} if the point belongs to the fractal, otherwise number of iterations

@@ -52,7 +52,7 @@ public class SaveDialog extends BaseDialog {
     @FXML
     private ProgressBar progressBar;
 
-    // parameters for rendering fractal
+    // parameters for drawing the fractal
     private ComplexFractalChecker complexFractalChecker;
     private IterativePalette iterativePalette;
     private Point2DTransformer transform;
@@ -147,11 +147,11 @@ public class SaveDialog extends BaseDialog {
     }
 
     /**
-     * Initialize function, it will be invoked after the scene graph is loaded.
+     * Initialization function, it will be invoked after the scene graph is loaded.
      */
     @FXML
     private void initialize() {
-        // set validation of the width and height
+        // set validators of the width and height
         TextFormatterUtil.setIntegerRange(imageWidth, 100, 8000, 1600);
         TextFormatterUtil.setIntegerRange(imageHeight, 100, 6000, 900);
         // set auto resolver for absolute path for fileName
@@ -159,7 +159,7 @@ public class SaveDialog extends BaseDialog {
             try {
                 fileName.setText(Paths.get(fileName.getText()).toAbsolutePath().toString());
             } catch (InvalidPathException e) {
-                // do nothing (error will show when user clicks "save" button
+                // do nothing (error will show when user clicks "save" button)
             }
         };
         fileName.onActionProperty().addListener((obj, o, n) -> pathResolver.accept(obj));
@@ -215,7 +215,7 @@ public class SaveDialog extends BaseDialog {
             throw new IllegalArgumentException("IterativePalette isn't set");
         }
 
-        // get users input
+        // get user input
         int width = Integer.valueOf(imageWidth.getText());
         int height = Integer.valueOf(imageHeight.getText());
         Path file;
@@ -225,7 +225,7 @@ public class SaveDialog extends BaseDialog {
             new Alert(Alert.AlertType.ERROR, "Uncorrected file path: " + fileName.getText()).showAndWait();
             return;
         }
-        // check that set file have ".png" extension
+        // check that file have ".png" extension
         if (!file.toString().endsWith(".png")) {
             new Alert(Alert.AlertType.ERROR, "The file must have \".png\" extension.").showAndWait();
             return;
@@ -268,7 +268,7 @@ public class SaveDialog extends BaseDialog {
             }
 
             // enable save button
-            saveButton.setDisable(false);
+            Platform.runLater(() -> saveButton.setDisable(false));
         }).start();
     }
 

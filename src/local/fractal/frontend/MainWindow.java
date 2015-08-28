@@ -18,13 +18,14 @@ import javafx.stage.Stage;
 import local.fractal.model.ComplexFractal;
 import local.fractal.util.ComplexFractalCanvasDrawer;
 import local.fractal.util.IterativePaletteSin;
+import local.fractal.util.Point2DTransformer;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
 
 /**
- * The {@code } represents controller of the main window.
+ * The {@code MainWindow} represents controller of the main window.
  *
  * @author Kochin Konstantin Alexandrovich
  */
@@ -51,7 +52,7 @@ public class MainWindow {
     @FXML
     private ToggleGroup rotateShiftToggleGroup;
 
-    // coordinate of the mouse over the canvas
+    // coordinates of the mouse over the canvas
     private double xMouseCanvas;
     private double yMouseCanvas;
 
@@ -88,8 +89,6 @@ public class MainWindow {
      */
     public void initialize() {
         fd = new ComplexFractalCanvasDrawer(mainCanvas, ChooseComplexFractalDialog.getDefaultComplexFractal(), SinPaletteChoiceDialog.getDefaultPalette());
-        //fd = new ComplexFractalCanvasDrawer(mainCanvas, new JuliaSet(), SinPaletteChoiceDialog.getDefaultPalette());
-        //fd = new ComplexFractalCanvasDrawer(mainCanvas, new ComplexFractalVersion1(), SinPaletteChoiceDialog.getDefaultPalette());
         // set indicator of the working
         InvalidationListener updateWorkIndicator = (obs) -> {
             boolean status = ((ReadOnlyBooleanProperty) obs).get();
@@ -151,7 +150,14 @@ public class MainWindow {
     private void canvasMouseDrag(MouseEvent event) {
         if (isTranslateChosen()) {
             // shift image
+            Point2DTransformer prevTr = fd.getTransform();
             fd.translateImage(event.getX() - xMouseCanvas, event.getY() - yMouseCanvas);
+            Point2DTransformer nextTr = fd.getTransform();
+            // store coordinate of the mouse on the canvas if transform is changed
+            if (!nextTr.equals(prevTr)) {
+                xMouseCanvas = event.getX();
+                yMouseCanvas = event.getY();
+            }
         } else {
             // rotate image
 
@@ -165,15 +171,14 @@ public class MainWindow {
             double vXO = xC - xMouseCanvas;
             double vYO = -(yC - yMouseCanvas);
             // calculate the angle between {vXN, vYN} and {vXO, vYO}
-            double angle = Math.atan2(vYN, vXN) - Math.atan2(vYO, vXO);
+            double angle = Math.atan2(vYO, vXO) - Math.atan2(vYN, vXN);
             if (!Double.isNaN(angle)) {
                 fd.rotateImage(angle);
             }
+            // store the coordinate of the mouse on the canvas
+            xMouseCanvas = event.getX();
+            yMouseCanvas = event.getY();
         }
-
-        // store the coordinate of the mouse on the canvas
-        xMouseCanvas = event.getX();
-        yMouseCanvas = event.getY();
     }
 
     /**
@@ -205,12 +210,14 @@ public class MainWindow {
      */
     @FXML
     private void canvasMouseClicked(MouseEvent event) {
+        final double scaleCoefficient = 2;
+
         if (event.getClickCount() >= 2) {
             // scale image
             if (isZoomInChosen())
-                fd.scaleImage(0.5, 0.5, event.getX(), event.getY());
+                fd.scaleImage(1 / scaleCoefficient, 1 / scaleCoefficient, event.getX(), event.getY());
             else
-                fd.scaleImage(2, 2, event.getX(), event.getY());
+                fd.scaleImage(scaleCoefficient, scaleCoefficient, event.getX(), event.getY());
         }
     }
 
@@ -218,7 +225,7 @@ public class MainWindow {
      * Opens save dialog.
      */
     @FXML
-    private void openSaveDialog() throws IOException {
+    private void openSaveDialog() {
         // create new dialog window if this is required
         if (saveDialog == null) {
             // create new stage
@@ -241,7 +248,7 @@ public class MainWindow {
      * Opens choosing palette dialog.
      */
     @FXML
-    private void openSinPaletteChoiceDioalog() {
+    private void openSinPaletteChoiceDialog() {
         // get and check palette
         if (!(fd.getPalette() instanceof IterativePaletteSin)) {
             new Alert(Alert.AlertType.ERROR, "It cannot modify that palette type.").show();
@@ -249,7 +256,7 @@ public class MainWindow {
         }
         IterativePaletteSin palette = (IterativePaletteSin) fd.getPalette();
 
-        // get limit iterations of the ComplexFractalChecker
+        // get and check current fractal
         if (!(fd.getFractal() instanceof ComplexFractal)) {
             new Alert(Alert.AlertType.ERROR, "It cannot modify that palette type with that type of the fractal.").show();
             return;

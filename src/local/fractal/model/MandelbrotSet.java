@@ -26,9 +26,9 @@ public final class MandelbrotSet extends ComplexFractal {
     /**
      * Default constructor.
      * <p>
-     * matIter = 1024,
+     * {@code matIter = 1024},
      * <p>
-     * criticalR = 2.0
+     * {@code criticalR = 2.0}
      */
     public MandelbrotSet() {
         super(1024, 2.0);

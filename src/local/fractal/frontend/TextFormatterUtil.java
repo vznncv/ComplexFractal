@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 /**
  * The {@code TextFormatterUtil} provides method for adding validation for the {@link  javafx.scene.control.TextField}
- * for to input the integer number.
+ * for to input the integer, double and complex number.
  *
  * @author Kochin Konstantin Alexandrovich
  */
@@ -123,7 +123,7 @@ public class TextFormatterUtil {
 
     /**
      * Adds validators (using {@code onFocus} and {@code onAction} events) for to input {@link
-     * local.fractal.model.ComplexNumber} in the textfield.
+     * local.fractal.model.ComplexNumber} in the text field.
      *
      * @param textField    text field
      * @param defaultValue default value of the complex number

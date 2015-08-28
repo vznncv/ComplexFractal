@@ -29,15 +29,15 @@ final public class Point2DTransformer {
     /**
      * Constructor.
      *
-     * @param trMartix transform matrix
-     * @throws NullPointerException     if trMartix is null
-     * @throws IllegalArgumentException if trMartix.length doesn't equal 9
+     * @param trMatrix transform matrix
+     * @throws NullPointerException     if trMatrix is null
+     * @throws IllegalArgumentException if trMatrix.length doesn't equal 9
      */
-    private Point2DTransformer(double[] trMartix) {
-        Objects.requireNonNull(trMartix);
-        if (trMartix.length != 9)
-            throw new IllegalArgumentException("trMartix isn't matrix 3 by 3");
-        this.trMatrix = trMartix;
+    private Point2DTransformer(double[] trMatrix) {
+        Objects.requireNonNull(trMatrix);
+        if (trMatrix.length != 9)
+            throw new IllegalArgumentException("trMatrix isn't matrix 3 by 3");
+        this.trMatrix = trMatrix;
     }
 
     /**
@@ -80,17 +80,12 @@ final public class Point2DTransformer {
     public Point2D apply(Point2D point) {
         Objects.requireNonNull(point);
 
-        double[] oldP = {point.getX(), point.getY(), 1};
-        double[] newP = new double[3];
-
-        for (int i = 0; i < 3; i++) {
-            double sum = 0;
-            for (int j = 0; j < 3; j++)
-                sum += trMatrix[i * 3 + j] * oldP[j];
-            newP[i] = sum;
-        }
-
-        return new Point2D(newP[0] / newP[2], newP[1] / newP[2]);
+        double oldX = point.getX();
+        double oldY = point.getY();
+        double newX = trMatrix[0] * oldX + trMatrix[1] * oldY + trMatrix[2];
+        double newY = trMatrix[3] * oldX + trMatrix[4] * oldY + trMatrix[5];
+        double normXY = trMatrix[6] * oldX + trMatrix[7] * oldY + trMatrix[8];
+        return new Point2D(newX / normXY, newY / normXY);
     }
 
     /**
@@ -121,7 +116,7 @@ final public class Point2DTransformer {
     }
 
     /**
-     * Adds Scaling transformation.
+     * Adds scaling transformation.
      *
      * @param xScale x scaling
      * @param yScale y scaling

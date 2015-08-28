@@ -8,11 +8,11 @@ import static java.lang.Math.PI;
 import static java.lang.Math.sin;
 
 /**
- * Simple sinusoidal palette for fractal.
+ * The {@code IterativePaletteSin} represents simple sinusoidal palette for fractal.
  * <p>
  * This class is immutable.
  * <p>
- * This palette calculating color with next formula: <br>
+ * This palette calculates color with next formula: <br>
  * if {@code numIter} is greater than zero: {@code color =  sin(((numIter - 1) / period) * 2 * PI + initialPhase) / 2 +
  * 0.5} for each channel,<br>
  * else: {@code color = fractalColor}.

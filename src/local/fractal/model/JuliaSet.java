@@ -9,7 +9,7 @@ import java.util.Objects;
  * <p>
  * {@code F(z) = z^2 + z * c1 + c2},
  * <p>
- * where: {@code c1} and  {@code c2} parameters ( @code c1} and  {@code c2} are complex number).
+ * where: {@code c1} and  {@code c2} parameters {(@code c1} and  {@code c2} are complex number).
  * <p>
  * The objects of this class are immutable.
  *
@@ -38,9 +38,9 @@ public final class JuliaSet extends ComplexFractal {
      * <p>
      * {@code F(z) = z^2 + z * 0 - 0.8 + 0.2i}
      * <p>
-     * matIter = 1024,
+     * {@code matIter = 1024},
      * <p>
-     * criticalR = 2.0
+     * {@code criticalR = 2.0}
      */
     public JuliaSet() {
         this(new ComplexNumber(0.0, 0.0), new ComplexNumber(-0.8, 0.2), 1024, 2.0);
