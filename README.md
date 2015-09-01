@@ -10,4 +10,4 @@ The application can draw and save images of fractals, such as:
 ![Mandelbrot set](ReadmeResources/2.png)
 ![Mandelbrot set](ReadmeResources/3.png)
 
-For compiling this project is requered JDK 8u40 or greater.
+For compiling this project is required JDK 8u40 or greater.
