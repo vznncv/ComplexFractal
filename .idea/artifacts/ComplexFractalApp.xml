@@ -1,22 +1,9 @@
 <component name="ArtifactManager">
-  <artifact type="javafx" name="ComplexFractalApp">
+  <artifact type="jar" name="ComplexFractalApp">
     <output-path>$PROJECT_DIR$/out/artifacts/ComplexFractalApp</output-path>
-    <properties id="javafx-properties">
-      <options>
-        <option name="appClass" value="local.fractal.Main" />
-        <option name="description" value="" />
-        <option name="height" value="600" />
-        <option name="htmlParamFile" value="" />
-        <option name="paramFile" value="" />
-        <option name="title" value="" />
-        <option name="vendor" value="" />
-        <option name="width" value="800" />
-      </options>
-    </properties>
-    <root id="root">
-      <element id="archive" name="ComplexFractalApp.jar">
-        <element id="module-output" name="ComplexFractal" />
-      </element>
+    <root id="archive" name="ComplexFractalApp.jar">
+      <element id="module-output" name="ComplexFractal" />
+      <element id="file-copy" path="$PROJECT_DIR$/LICENSE.txt" />
     </root>
   </artifact>
 </component>

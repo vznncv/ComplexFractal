@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?language javascript?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import java.net.URL?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:id="root"
+      prefHeight="500.0" prefWidth="600.0" fx:controller="local.complexfractal.frontend.ChooseComplexFractalDialog">
+    <stylesheets>
+        <URL value="@CommonStyles.css"/>
+        <URL value="@ChooseComplexFractalDialog.css"/>
+    </stylesheets>
+
+
+    <!-- Settings for choosing maxIter and criticalR -->
+    <GridPane fx:id="baseSettingsPanel" styleClass="borderControlPanel">
+        <columnConstraints>
+            <ColumnConstraints minWidth="232" halignment="RIGHT"/>
+            <ColumnConstraints hgrow="ALWAYS"/>
+        </columnConstraints>
+
+        <Label GridPane.rowIndex="0" GridPane.columnIndex="0" text="Maximum number of the iterations"/>
+        <TextField fx:id="complexFractalParamMaxIter" GridPane.rowIndex="0" GridPane.columnIndex="1" text="1024"/>
+        <Label GridPane.rowIndex="1" GridPane.columnIndex="0" text="Radius of the bound"/>
+        <TextField fx:id="complexFractalParamCriticalR" GridPane.rowIndex="1" GridPane.columnIndex="1" text="2.0"/>
+    </GridPane>
+
+
+    <!-- Choosing the current fractal -->
+    <ChoiceBox fx:id="choiceFractal" BorderPane.alignment="CENTER_LEFT"/>
+
+
+    <!-- Settings for the certain fractals -->
+    <BorderPane VBox.vgrow="ALWAYS" fx:id="settingsPanel" styleClass="borderControlPanel">
+        <center>
+            <fx:define>
+                <!-- Mandelbrot set settings -->
+                <BorderPane fx:id="mandelbrotSetSettings">
+                    <top>
+                        <TextFlow>
+                            <Hyperlink text="Mandelbrot set"
+                                       onAction="Java.type('local.complexfractal.Main').showDocument('https://en.wikipedia.org/wiki/Mandelbrot_set')"/>
+                            <Text text=".&#xA;"/>
+                            <Text text="For drawing the fractal uses "/>
+                            <Hyperlink text="escape time algorithm"
+                                       onAction="Java.type('local.complexfractal.Main').showDocument('https://en.wikipedia.org/wiki/Mandelbrot_set#Escape_time_algorithm')"/>
+                            <Text text="."/>
+                        </TextFlow>
+                    </top>
+                    <center>
+                        <!-- None -->
+                    </center>
+                </BorderPane>
+
+                <!-- Julia set settings -->
+                <BorderPane fx:id="juliaSetSettings">
+                    <top>
+                        <TextFlow>
+                            <Hyperlink text="Julia set"
+                                       onAction="Java.type('local.complexfractal.Main').showDocument('https://en.wikipedia.org/wiki/Julia_set')"/>
+                            <Text text=" with equation f(z) = z^2 + c1 * z + c2.&#xA;"/>
+                            <Text text="For drawing the fractal uses escape time algorithm."/>
+                        </TextFlow>
+                    </top>
+                    <center>
+                        <GridPane fx:id="juliaSetParamPane">
+                            <columnConstraints>
+                                <ColumnConstraints halignment="RIGHT"/>
+                                <ColumnConstraints hgrow="ALWAYS"/>
+                            </columnConstraints>
+
+                            <Label GridPane.rowIndex="0" GridPane.columnIndex="0" text="c1"/>
+                            <TextField fx:id="juliaSetParamC1" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                       text="some param"/>
+                            <Label GridPane.rowIndex="1" GridPane.columnIndex="0" text="c2"/>
+                            <TextField fx:id="juliaSetParamC2" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                                       text="some param"/>
+                        </GridPane>
+                    </center>
+                </BorderPane>
+
+                <!-- Complex fractal version 1 settings -->
+                <BorderPane fx:id="complexFractalV1Settings">
+                    <top>
+                        <TextFlow>
+                            <Text text="This fractal is set of values of c in the complex plane for which the orbit of 0 under iteration of the expression:&#xA;"/>
+                            <Text text="z_(n+1) = z_n ^ n1 + z_n ^ n2 + c&#xA;"/>
+                            <Text text="remains bounded."/>
+                            <Text text="That is, a complex number c is part of this fractal if, when starting with z_0 = 0 and applying the iteration repeatedly,"/>
+                            <Text text=" the absolute value of z_n remains bounded however large n gets.&#xA;"/>
+                            <Text text="This fractal is similar the "/>
+                            <Hyperlink text="Mandelbrot set"
+                                       onAction="Java.type('local.complexfractal.Main').showDocument('https://en.wikipedia.org/wiki/Mandelbrot_set')"/>
+                            <Text text=" and for it drawing also uses escape time algorithm."/>
+                        </TextFlow>
+                    </top>
+                    <center>
+                        <GridPane fx:id="complexFractalV1ParamPane">
+                            <columnConstraints>
+                                <ColumnConstraints halignment="RIGHT"/>
+                                <ColumnConstraints hgrow="ALWAYS"/>
+                            </columnConstraints>
+
+                            <Label GridPane.rowIndex="0" GridPane.columnIndex="0" text="n1"/>
+                            <TextField fx:id="complexFractalVersion1ParamN1" GridPane.rowIndex="0"
+                                       GridPane.columnIndex="1" text="some param"/>
+                            <Label GridPane.rowIndex="1" GridPane.columnIndex="0" text="n2"/>
+                            <TextField fx:id="complexFractalVersion1ParamN2" GridPane.rowIndex="1"
+                                       GridPane.columnIndex="1" text="some param"/>
+                        </GridPane>
+                    </center>
+                </BorderPane>
+
+            </fx:define>
+        </center>
+    </BorderPane>
+
+
+    <!-- Buttons for applying/canceling changes -->
+    <HBox fx:id="actionPanel" styleClass="saveComplexFractal">
+        <Button text="apply" onAction="#saveComplexFractal"/>
+        <Button text="default" onAction="#defaultFractals"/>
+        <Button text="cancel" onAction="#notSaveComplexFractal"/>
+    </HBox>
+
+</VBox>

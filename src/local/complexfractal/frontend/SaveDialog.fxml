@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:id="root"
+            prefHeight="200.0" prefWidth="600.0" fx:controller="local.complexfractal.frontend.SaveDialog">
+    <stylesheets>
+        <URL value="@CommonStyles.css"/>
+        <URL value="@SaveDialogStyle.css"/>
+    </stylesheets>
+
+    <center>
+        <VBox fx:id="saveSettingPanel">
+            <BorderPane fx:id="chooseFilePanel">
+                <left>
+                    <Button onAction="#chooseFile" text="Chose file"/>
+                </left>
+                <center>
+                    <BorderPane>
+                        <center>
+                            <TextField fx:id="fileName"/>
+                        </center>
+                    </BorderPane>
+                </center>
+            </BorderPane>
+
+            <GridPane fx:id="sizeSettingPanel">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="50"/>
+                    <ColumnConstraints percentWidth="50"/>
+                </columnConstraints>
+
+                <HBox GridPane.rowIndex="0" GridPane.columnIndex="0">
+                    <Label text="Width:"/>
+                    <TextField fx:id="imageWidth"/>
+                    <Label text="px"/>
+                </HBox>
+
+                <HBox GridPane.rowIndex="0" GridPane.columnIndex="1">
+                    <Label text="Height:"/>
+                    <TextField fx:id="imageHeight"/>
+                    <Label text="px"/>
+                </HBox>
+
+            </GridPane>
+            <BorderPane fx:id="progressPanel">
+                <left>
+                    <ProgressIndicator progress="${progressBar.progress}"/>
+                </left>
+                <center>
+                    <ProgressBar fx:id="progressBar"/>
+                </center>
+            </BorderPane>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox fx:id="actionPanel" styleClass="borderControlPanel">
+            <Button fx:id="saveButton" onAction="#save" text="Save"/>
+            <Button fx:id="cancelButton" onAction="#cancel" text="Cancel"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>
