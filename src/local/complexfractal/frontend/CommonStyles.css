@@ -1,7 +1,7 @@
 /* Common style for all elements */
 * {
     -fx-color: DARKCYAN; /* see caspian.css */
-    -fx-font-family: "Arial Narrow";
+    -fx-font-family: "Verdana", "DejaVu Sans", "Lucida Sans Unicode", "sans-serif";
     -fx-text-fill: white;
     /* see caspian.css; it's need for correct display RadioButton and ChoiceBox */
     -fx-shadow-highlight-color: ladder(

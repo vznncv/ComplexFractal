@@ -10,8 +10,8 @@
     -fx-vgap: 10px;
 }
 #redPhi0Label, #greenPhi0Label, #bluePhi0Label {
-    -fx-pref-width: 40px;
-    -fx-alignment: center-right;
+    -fx-pref-width: 45px;
+    -fx-alignment: center-left;
 }
 #redPhi0Slider, #greenPhi0Slider, #bluePhi0Slider {
     -fx-rotate: 180;

@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import java.net.URL?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:id="root"
-            prefHeight="400.0" prefWidth="600.0" fx:controller="local.complexfractal.frontend.SinPaletteChoiceDialog">
+            prefHeight="400.0" prefWidth="680.0" fx:controller="local.complexfractal.frontend.SinPaletteChoiceDialog">
     <stylesheets>
         <URL value="@CommonStyles.css"/>
         <URL value="@SinPaletteChoiceDialog.css"/>
@@ -18,8 +18,8 @@
             <!-- Color settings of the fractal background -->
             <GridPane fx:id="backgroundPaletteSettings">
                 <columnConstraints>
-                    <ColumnConstraints prefWidth="50"/>
-                    <ColumnConstraints prefWidth="100"/>
+                    <ColumnConstraints prefWidth="60"/>
+                    <ColumnConstraints prefWidth="120"/>
                     <ColumnConstraints hgrow="ALWAYS"/>
                 </columnConstraints>
 
